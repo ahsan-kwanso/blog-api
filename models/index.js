@@ -46,4 +46,4 @@ db.Sequelize = Sequelize;
 
 export default db;
 
-export { User, Post, Comment, Sequelize };
+export { User, Post, Comment, Sequelize, sequelize };

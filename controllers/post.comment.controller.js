@@ -1,5 +1,5 @@
 import db from "../models/index.js";
-import { getCommentsByPostIdData } from "./comment.controller.js";
+import { getCommentsByPostIdService as getCommentsByPostIdData } from "../services/comment.service.js";
 import paginationConfig from "../config/pagination.config.js";
 import {
   validatePagination,

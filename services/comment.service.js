@@ -71,19 +71,18 @@ const getCommentsByPostIdService = async (post_id, page, limit, req) => {
     throw new Error("Post not found");
   }
 
-  const { count, rows } = await Comment.findAndCountAll({
+  const comments = await Comment.findAndCountAll({
     where: { PostId: post_id },
     limit: pagination.pageSize,
     offset: (pagination.pageNumber - 1) * pagination.pageSize,
   });
-
-  const commentsWithSubComments = buildCommentTree(rows);
-  const totalPages = Math.ceil(count / pagination.pageSize);
+  const commentsWithSubComments = buildCommentTree(comments.rows);
+  const totalPages = Math.ceil(comments.count / pagination.pageSize);
   const nextPage =
     pagination.pageNumber < totalPages ? pagination.pageNumber + 1 : null;
 
   return {
-    total: count,
+    total: comments.count,
     page: pagination.pageNumber,
     pageSize: pagination.pageSize,
     nextPageUrl: generateNextPageUrl(nextPage, pagination.pageSize, req),

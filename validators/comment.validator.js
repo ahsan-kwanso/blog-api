@@ -5,10 +5,6 @@ const createCommentValidationRules = [
   check("PostId").isInt().withMessage("Valid PostId is required"),
   check("title").notEmpty().withMessage("Title is required"),
   check("content").notEmpty().withMessage("Content is required"),
-  check("ParentId")
-    .optional()
-    .isInt()
-    .withMessage("Valid ParentId is required"),
 ];
 
 // Update Comment Validation Rules

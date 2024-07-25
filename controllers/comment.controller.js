@@ -37,7 +37,7 @@ const getCommentsByPostId = async (req, res) => {
   } = req.query;
 
   try {
-    const data = await getCommentsByPostIdService(post_id, page, limit);
+    const data = await getCommentsByPostIdService(post_id, page, limit, req);
     return res.status(200).json(data);
   } catch (error) {
     return res

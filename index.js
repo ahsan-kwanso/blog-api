@@ -9,8 +9,8 @@ import postCommentRoutes from "./routes/post.comment.route.js";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT;
-
+const PORT = process.env.PORT || 3000;
+console.log("Testing on Heroku", PORT);
 app.use(express.json()); // Middleware to parse JSON bodies
 
 app.get("/", (req, res) => {

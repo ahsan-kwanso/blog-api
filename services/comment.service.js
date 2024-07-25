@@ -12,10 +12,6 @@ const createCommentService = async (
   ParentId,
   UserId
 ) => {
-  if (!title || !content || !PostId) {
-    throw new Error("Title, content, and PostId are required!");
-  }
-
   const post = await Post.findByPk(PostId);
   if (!post) {
     throw new Error("Post not Found");

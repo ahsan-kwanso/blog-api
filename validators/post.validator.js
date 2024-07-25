@@ -8,6 +8,7 @@ const createPostValidationRules = [
 
 // Update Post Validation Rules
 const updatePostValidationRules = [
+  check("post_id").isInt().withMessage("Valid PostId is required"),
   check("title").optional().notEmpty().withMessage("Title cannot be empty"),
   check("content").optional().notEmpty().withMessage("Content cannot be empty"),
 ];

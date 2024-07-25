@@ -17,7 +17,7 @@ const config = {
     dialect: process.env.DB_DIALECT_TEST || "postgres",
   },
   production: {
-    production_db_url: process.env.POSTGRES_URL, // Heroku provides the database URL in this environment variable
+    production_db_url: process.env.DATABASE_URL, // Heroku provides the database URL in this environment variable
     dialect: process.env.DB_DIALECT_TEST || "postgres",
   },
 };

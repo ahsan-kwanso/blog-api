@@ -12,7 +12,7 @@ const config = configFile[env];
 dotenv.config();
 let sequelize;
 if (env == "production") {
-  sequelize = new Sequelize(process.env.HEROKU_POSTGRESQL_BLUE_URL, {
+  sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: config.dialect,
     dialectModule: pg,
   });

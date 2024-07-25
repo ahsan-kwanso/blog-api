@@ -2,9 +2,10 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("Comment", {
-      comment_id: {
+    await queryInterface.createTable("Comments", {
+      id: {
         type: Sequelize.INTEGER,
+        allowNull: false,
         autoIncrement: true,
         primaryKey: true,
       },
@@ -13,47 +14,50 @@ module.exports = {
         allowNull: false,
       },
       content: {
-        type: Sequelize.TEXT,
+        type: Sequelize.STRING,
         allowNull: false,
       },
-      parent_comment_id: {
+      UserId: {
         type: Sequelize.INTEGER,
-        allowNull: true,
+        allowNull: false,
         references: {
-          model: "Comment",
-          key: "comment_id",
+          model: "Users",
+          key: "id",
         },
         onDelete: "CASCADE",
       },
-      user_id: {
+      PostId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "User",
-          key: "user_id",
+          model: "Posts",
+          key: "id",
         },
+        onDelete: "CASCADE",
       },
-      post_id: {
+      ParentId: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
-          model: "Post",
-          key: "post_id",
+          model: "Comments",
+          key: "id",
         },
         onDelete: "CASCADE",
       },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("Comment");
+    await queryInterface.dropTable("Comments");
   },
 };

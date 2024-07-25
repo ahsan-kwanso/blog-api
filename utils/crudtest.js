@@ -1,6 +1,6 @@
 // utils/crudtest.js
 
-const db = require("../models/sequelize"); // Adjust the path to your sequelize file if necessary
+import db from "../models/index.js";
 
 async function testCRUDOperations() {
   try {

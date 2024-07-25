@@ -1,32 +1,37 @@
-const db = require("../models/sequelize");
-const errorHandler = require("../utils/error.js");
-const {
+import db from "../models/index.js";
+import paginationConfig from "../config/pagination.config.js";
+import {
   validatePagination,
   generateNextPageUrl,
-} = require("../utils/pagination.js");
-const paginationConfig = require("../config/pagination.config.js");
+} from "../utils/pagination.js";
 
 // Create a new post
-const createPost = async (req, res, next) => {
+const createPost = async (req, res) => {
   const { title, content } = req.body;
-  const { user_id } = req.user; // Extract user_id from authenticated user
+  const { id } = req.user; // Extract user_id from authenticated user
+
   try {
     if (!title || !content) {
-      return next(errorHandler(400, "Title and content are required"));
+      return res
+        .status(400)
+        .json({ success: false, message: "Title and content are required" });
     }
     const post = await db.Post.create({
       title,
       content,
-      user_id,
+      UserId: id,
     });
-    return res.status(201).json(post);
+    return res.status(201).json({ success: true, post });
   } catch (error) {
-    return next(errorHandler(500, "Internal server error"));
+    console.error(error.message); // Optional: log the error message
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 };
 
 // Get all posts with pagination
-const getPosts = async (req, res, next) => {
+const getPosts = async (req, res) => {
   const {
     page = paginationConfig.defaultPage,
     limit = paginationConfig.defaultLimit,
@@ -36,7 +41,9 @@ const getPosts = async (req, res, next) => {
     // Validate pagination parameters
     const pagination = validatePagination(page, limit);
     if (pagination.error) {
-      return next(errorHandler(400, pagination.error));
+      return res
+        .status(400)
+        .json({ success: false, message: pagination.error });
     }
 
     // Fetch posts with pagination
@@ -52,6 +59,7 @@ const getPosts = async (req, res, next) => {
     const nextPageUrl = generateNextPageUrl(nextPage, pagination.pageSize, req);
 
     res.status(200).json({
+      success: true,
       total: count,
       page: pagination.pageNumber,
       pageSize: pagination.pageSize,
@@ -59,67 +67,89 @@ const getPosts = async (req, res, next) => {
       posts: rows,
     });
   } catch (error) {
-    return next(errorHandler(500, "Internal server error"));
+    console.error(error.message); // Optional: log the error message
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 };
 
 // Get a single post by ID
-const getPostById = async (req, res, next) => {
+const getPostById = async (req, res) => {
   const { post_id } = req.params;
 
   try {
     const post = await db.Post.findByPk(post_id);
     if (!post) {
-      return next(errorHandler(404, "Post not found"));
+      return res
+        .status(404)
+        .json({ success: false, message: "Post not found" });
     }
-    return res.status(200).json(post);
+    return res.status(200).json({ success: true, post });
   } catch (error) {
-    return next(errorHandler(500, "Internal server error"));
+    console.error(error.message); // Optional: log the error message
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 };
 
 // Update a post
-const updatePost = async (req, res, next) => {
+const updatePost = async (req, res) => {
   const { post_id } = req.params;
   const { title, content } = req.body;
-  const { user_id } = req.user;
+  const { id } = req.user;
+
   try {
     const post = await db.Post.findByPk(post_id);
     if (!post) {
-      return next(errorHandler(404, "Post not found"));
+      return res
+        .status(404)
+        .json({ success: false, message: "Post not found" });
     }
-    if (post.user_id !== user_id) {
-      return next(errorHandler(403, "ForBidden"));
+    if (post.UserId !== id) {
+      return res.status(403).json({ success: false, message: "Forbidden" });
     }
 
     post.title = title || post.title;
     post.content = content || post.content;
     await post.save();
 
-    return res.status(200).json(post);
+    return res.status(200).json({ success: true, post });
   } catch (error) {
-    return next(errorHandler(500, "Internal server error"));
+    console.error(error.message); // Optional: log the error message
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 };
 
 // Delete a post
-const deletePost = async (req, res, next) => {
+const deletePost = async (req, res) => {
   const { post_id } = req.params;
-  const { user_id } = req.user;
+  const { id } = req.user;
+
   try {
     const post = await db.Post.findByPk(post_id);
     if (!post) {
-      return next(errorHandler(404, "Post not found"));
+      return res
+        .status(404)
+        .json({ success: false, message: "Post not found" });
     }
-    if (post.user_id !== user_id) {
-      return next(errorHandler(403, "ForBidden"));
+    if (post.UserId !== id) {
+      return res.status(403).json({ success: false, message: "Forbidden" });
     }
-    //await db.Comment.destroy({ where: { post_id: post } });
+
     await post.destroy();
-    return res.status(200).json({ message: "Post deleted successfully" });
+    return res
+      .status(200)
+      .json({ success: true, message: "Post deleted successfully" });
   } catch (error) {
-    return next(errorHandler(500, "Internal server error"));
+    console.error(error.message); // Optional: log the error message
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 };
 
-module.exports = { createPost, getPosts, getPostById, updatePost, deletePost };
+export { createPost, getPosts, getPostById, updatePost, deletePost };

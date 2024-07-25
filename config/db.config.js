@@ -1,4 +1,6 @@
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
+
 const config = {
   development: {
     username: process.env.DB_USERNAME_DEV,
@@ -20,4 +22,4 @@ const config = {
   },
 };
 
-module.exports = config;
+export default config;

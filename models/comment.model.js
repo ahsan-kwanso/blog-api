@@ -1,74 +1,66 @@
-"use strict";
-const { Model } = require("sequelize");
-
-module.exports = (sequelize, DataTypes) => {
-  class Comment extends Model {
-    static associate(models) {
-      Comment.belongsTo(models.User, { foreignKey: "user_id" });
-      Comment.belongsTo(models.Post, {
-        foreignKey: "post_id",
-        onDelete: "CASCADE",
-      });
-      Comment.belongsTo(models.Comment, {
-        foreignKey: "parent_comment_id",
-        as: "ParentComment",
-        onDelete: "CASCADE",
-      });
-      Comment.hasMany(models.Comment, {
-        foreignKey: "parent_comment_id",
-        as: "ChildComments",
-        onDelete: "CASCADE",
-      });
-    }
-  }
-
-  Comment.init(
-    {
-      comment_id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-      },
-      title: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      content: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-      },
-      parent_comment_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        references: {
-          model: "Comment",
-          key: "comment_id",
-        },
-      },
-      user_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: "User",
-          key: "user_id",
-        },
-      },
-      post_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: "Post",
-          key: "post_id",
-        },
+export default (sequelize, DataTypes) => {
+  const Comment = sequelize.define("Comment", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    content: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    UserId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "Users",
+        key: "id",
       },
     },
-    {
-      sequelize,
-      //paranoid: true, //you have to add deletedAt table in migrations to get this working
-      freezeTableName: true,
-      modelName: "Comment",
-    }
-  );
+    PostId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "Posts",
+        key: "id",
+      },
+    },
+    ParentId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: "Comments",
+        key: "id",
+      },
+    },
+  });
+
+  Comment.associate = (models) => {
+    Comment.belongsTo(models.User, {
+      foreignKey: "UserId",
+    });
+
+    Comment.belongsTo(models.Post, {
+      foreignKey: "PostId",
+      onDelete: "CASCADE",
+    });
+
+    Comment.belongsTo(models.Comment, {
+      as: "parentComment",
+      foreignKey: "ParentId",
+      onDelete: "CASCADE",
+    });
+
+    Comment.hasMany(models.Comment, {
+      as: "replies",
+      foreignKey: "ParentId",
+      onDelete: "CASCADE",
+    });
+  };
 
   return Comment;
 };

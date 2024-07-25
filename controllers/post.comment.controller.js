@@ -1,16 +1,15 @@
-const db = require("../models/sequelize");
-const { getCommentsByPostIdData } = require("./comment.controller.js");
-const errorHandler = require("../utils/error.js");
-const {
+import db from "../models/index.js";
+import { getCommentsByPostIdData } from "./comment.controller.js";
+import paginationConfig from "../config/pagination.config.js";
+import {
   validatePagination,
   generateNextPageUrl,
-} = require("../utils/pagination.js");
-const paginationConfig = require("../config/pagination.config.js");
+} from "../utils/pagination.js";
 
 const getPostsWithNestedComments = async (posts) => {
   return await Promise.all(
     posts.map(async (post) => {
-      const postId = post.post_id; // Adjust according to your actual post model
+      const postId = post.id; // Adjust according to your actual post model
       const comments = await getCommentsByPostIdData(postId);
       return {
         ...post.toJSON(),
@@ -41,7 +40,7 @@ const formatPaginationResponse = (
 };
 
 // Utility function to get posts with nested comments
-const getPostsWithComments = async (req, res, next) => {
+const getPostsWithComments = async (req, res) => {
   const {
     page = paginationConfig.defaultPage,
     limit = paginationConfig.defaultLimit,
@@ -50,7 +49,9 @@ const getPostsWithComments = async (req, res, next) => {
     // Validate pagination
     const pagination = validatePagination(page, limit);
     if (pagination.error) {
-      return next(errorHandler(400, pagination.error));
+      return res.status(400).json({
+        message: pagination.error,
+      });
     }
     // Fetch paginated posts
     const posts = await db.Post.findAll({
@@ -77,40 +78,45 @@ const getPostsWithComments = async (req, res, next) => {
       );
   } catch (error) {
     console.error(error.message); // Optional: log the error message
-    return next(errorHandler(500, "Internal server error"));
+    return res.status(500).json({
+      message: "Internal server error",
+    });
   }
 };
 
 // Utility function to get posts by user with nested comments
-const getPostsByUserWithComments = async (req, res, next) => {
+const getPostsByUserWithComments = async (req, res) => {
   const { user_id } = req.params;
   const {
     page = paginationConfig.defaultPage,
     limit = paginationConfig.defaultLimit,
   } = req.query;
-
+  const { id } = req.user;
   try {
-    if (parseInt(user_id) !== req.user.user_id) {
-      return next(errorHandler(403, "Forbidden"));
+    if (parseInt(user_id) !== id) {
+      return res.status(403).json({
+        message: "Forbidden",
+      });
     }
 
     // Validate pagination
     const pagination = validatePagination(page, limit);
     if (pagination.error) {
-      return next(errorHandler(400, pagination.error));
+      return res.status(400).json({
+        message: pagination.error,
+      });
     }
     // Fetch paginated posts specific to the user
     const posts = await db.Post.findAll({
-      where: { user_id },
+      where: { UserId: user_id },
       limit: pagination.pageSize,
       offset: (pagination.pageNumber - 1) * pagination.pageSize,
     });
-
     // Fetch and nest comments for each post
     const postsWithComments = await getPostsWithNestedComments(posts);
 
     // Calculate total number of posts for the user
-    const totalPosts = await db.Post.count({ where: { user_id } });
+    const totalPosts = await db.Post.count({ where: { UserId: user_id } });
 
     return res
       .status(200)
@@ -124,12 +130,14 @@ const getPostsByUserWithComments = async (req, res, next) => {
         )
       );
   } catch (error) {
-    return next(errorHandler(500, "Internal server error"));
+    return res.status(500).json({
+      message: "Internal server error",
+    });
   }
 };
 
 // Utility function to search posts by title or content
-const searchPostsByTitleOrContent = async (req, res, next) => {
+const searchPostsByTitleOrContent = async (req, res) => {
   const {
     title,
     content,
@@ -138,15 +146,17 @@ const searchPostsByTitleOrContent = async (req, res, next) => {
   } = req.query;
   try {
     if (!title && !content) {
-      return next(
-        errorHandler(400, "Title or content query parameter is required")
-      );
+      return res.status(400).json({
+        message: "Title or content query parameter is required",
+      });
     }
 
     // Validate pagination
     const pagination = validatePagination(page, limit);
     if (pagination.error) {
-      return next(errorHandler(400, pagination.error));
+      return res.status(400).json({
+        message: pagination.error,
+      });
     }
     // Fetch paginated posts that match the search criteria
     const posts = await db.Post.findAll({
@@ -178,11 +188,13 @@ const searchPostsByTitleOrContent = async (req, res, next) => {
         )
       );
   } catch (error) {
-    return next(errorHandler(500, "Internal server error"));
+    return res.status(500).json({
+      message: "Internal server error",
+    });
   }
 };
 
-module.exports = {
+export {
   getPostsWithComments,
   getPostsByUserWithComments,
   searchPostsByTitleOrContent,

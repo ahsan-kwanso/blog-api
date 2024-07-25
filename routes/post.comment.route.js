@@ -1,10 +1,10 @@
-const express = require("express");
-const { authenticateJWT } = require("../middlewares/authmiddleware.js");
-const {
+import express from "express";
+import { authenticateJWT } from "../middlewares/authmiddleware.js";
+import {
   getPostsWithComments,
   getPostsByUserWithComments,
   searchPostsByTitleOrContent,
-} = require("../controllers/post.comment.controller.js");
+} from "../controllers/post.comment.controller.js";
 
 const router = express.Router();
 
@@ -15,4 +15,4 @@ router.get("/", authenticateJWT, getPostsWithComments);
 router.get("/user/:user_id", authenticateJWT, getPostsByUserWithComments);
 router.get("/search", authenticateJWT, searchPostsByTitleOrContent);
 
-module.exports = router;
+export default router;

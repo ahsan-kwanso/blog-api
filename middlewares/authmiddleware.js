@@ -1,10 +1,11 @@
-const jwt = require("jsonwebtoken");
-const errorHandler = require("../utils/error.js");
+import jwt from "jsonwebtoken";
 
-const authenticateJWT = (req, res, next) => {
+export const authenticateJWT = (req, res, next) => {
   const token = req.header("Authorization")?.split(" ")[1];
   if (!token) {
-    return next(errorHandler(401, "Access Denied! You are not authenticated"));
+    return res.status(401).json({
+      message: "Access Denied! You are not authenticated",
+    });
   }
 
   try {
@@ -12,8 +13,8 @@ const authenticateJWT = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (ex) {
-    return next(errorHandler(403, "Token is not valid"));
+    return res.status(403).json({
+      message: "Token is not valid",
+    });
   }
 };
-
-module.exports = { authenticateJWT };

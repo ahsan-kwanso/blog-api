@@ -1,4 +1,4 @@
-const { URL } = require("url");
+import { URL, URLSearchParams } from "url";
 
 const validatePagination = (page, limit) => {
   const pageNumber = parseInt(page, 10);
@@ -29,4 +29,4 @@ const generateNextPageUrl = (nextPage, pageSize, req) => {
   return `${baseUrl}?${queryParams.toString()}`;
 };
 
-module.exports = { validatePagination, generateNextPageUrl };
+export { validatePagination, generateNextPageUrl };

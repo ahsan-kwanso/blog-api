@@ -3,4 +3,4 @@ const paginationConfig = {
   defaultLimit: 2,
 };
 
-module.exports = paginationConfig;
+export default paginationConfig;

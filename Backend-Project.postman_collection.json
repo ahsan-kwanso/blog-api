@@ -32,7 +32,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"user_name\": \"Ahsan2\",\n  \"email\": \"m.ahsan2@kwanso.com\",\n  \"password\": \"password123\"\n}",
+					"raw": "{\n  \"name\": \"Ahsan\",\n  \"email\": \"m.ahsan@kwanso.com\",\n  \"password\": \"password123\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -117,7 +117,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/posts",
+					"raw": "http://localhost:3000/posts?limit=2",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -125,6 +125,12 @@
 					"port": "3000",
 					"path": [
 						"posts"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "2"
+						}
 					]
 				}
 			},
@@ -163,7 +169,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"title\": \"Updated Title fifth Time\",\n  \"content\": \"Updated content of the post.\"\n}",
+					"raw": "{\n  \"title\": \"Backend Development\",\n  \"content\": \"NodeJs ExpressJs\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -184,7 +190,7 @@
 					"variable": [
 						{
 							"key": "post_id",
-							"value": "3"
+							"value": "2"
 						}
 					]
 				}
@@ -210,7 +216,7 @@
 					"variable": [
 						{
 							"key": "post_id",
-							"value": "5"
+							"value": "3"
 						}
 					]
 				}
@@ -224,7 +230,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"post_id\": 5,\n  \"title\": \"Deeper Nested Reply\",\n  \"content\": \"This is another level of nesting, reply to the fourth comment.\",\n  \"parent_comment_id\": 7\n}\n",
+					"raw": "{\n  \"PostId\": 1,\n  \"title\": \"Hi\",\n  \"content\": \"How are you.\",\n  \"ParentId\": 2\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -264,7 +270,7 @@
 					"variable": [
 						{
 							"key": "comment_id",
-							"value": "4"
+							"value": "2"
 						}
 					]
 				}
@@ -277,7 +283,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/comments/post/:post_id?page=1&limit=a",
+					"raw": "http://localhost:3000/comments/post/:post_id?limit=8",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -290,18 +296,14 @@
 					],
 					"query": [
 						{
-							"key": "page",
-							"value": "1"
-						},
-						{
 							"key": "limit",
-							"value": "a"
+							"value": "8"
 						}
 					],
 					"variable": [
 						{
 							"key": "post_id",
-							"value": "5"
+							"value": "1"
 						}
 					]
 				}
@@ -362,7 +364,7 @@
 					"variable": [
 						{
 							"key": "comment_id",
-							"value": "4"
+							"value": "2"
 						}
 					]
 				}
@@ -421,7 +423,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/comments?content=This",
+					"raw": "http://localhost:3000/comments?title=h&content=Ho",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -432,8 +434,12 @@
 					],
 					"query": [
 						{
+							"key": "title",
+							"value": "h"
+						},
+						{
 							"key": "content",
-							"value": "This"
+							"value": "Ho"
 						}
 					]
 				}
@@ -476,7 +482,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VyX25hbWUiOiJBaHNhbiIsImVtYWlsIjoibS5haHNhbkBrd2Fuc28uY29tIiwiaWF0IjoxNzIxNTg1MDcxLCJleHAiOjE3MjE1ODg2NzF9.baVQQjiabQqNRpSYZeN79v_dJe4Jl6sbHMt03nwpYwo",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwibmFtZSI6IkFoc2FuIiwiZW1haWwiOiJtLmFoc2FuQGt3YW5zby5jb20iLCJpYXQiOjE3MjE4NTEwMjcsImV4cCI6MTcyMTg1NDYyN30.i5JFV1YUEumxpbuE-uwBVaHyEeidTiEfVhwCuJmaadM",
 				"type": "string"
 			}
 		]

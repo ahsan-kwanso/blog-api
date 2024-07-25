@@ -1,182 +1,170 @@
-const db = require("../models/sequelize.js");
-const errorHandler = require("../utils/error.js");
-const {
+import db from "../models/index.js";
+import {
   validatePagination,
   generateNextPageUrl,
-} = require("../utils/pagination.js");
-const paginationConfig = require("../config/pagination.config.js");
+} from "../utils/pagination.js";
+import paginationConfig from "../config/pagination.config.js";
 
 // Create a new comment
-const createComment = async (req, res, next) => {
-  const { title, content, post_id, parent_comment_id } = req.body;
-  const { user_id } = req.user; // Extract user_id from authenticated user
-
+const createComment = async (req, res) => {
+  const { title, content, PostId, ParentId } = req.body;
+  const { id } = req.user; // Extract UserId from authenticated user
   try {
-    if (!title || !content || !post_id) {
-      return next(
-        errorHandler(400, "Title, content, and post_id are required!")
-      );
+    if (!title || !content || !PostId) {
+      return res.status(400).json({
+        message: "Title, content, and PostId are required!",
+      });
     }
-    const post = await db.Post.findByPk(post_id);
+    const post = await db.Post.findByPk(PostId);
     if (!post) {
-      return next(errorHandler(404, "Post not Found"));
+      return res.status(404).json({
+        message: "Post not Found",
+      });
     }
-    if (parent_comment_id) {
-      const parentComment = await db.Comment.findByPk(parent_comment_id);
+    if (ParentId) {
+      const parentComment = await db.Comment.findByPk(ParentId);
       if (!parentComment) {
-        return next(errorHandler(404, "This comment is deleted"));
+        return res.status(404).json({
+          message: "You can't reply to a non-existing comment",
+        });
       }
     }
     const comment = await db.Comment.create({
       title,
       content,
-      user_id,
-      post_id,
-      parent_comment_id,
+      UserId: id,
+      PostId,
+      ParentId,
     });
     return res.status(201).json(comment);
   } catch (error) {
-    return next(errorHandler(500, "Internal server error"));
+    return res.status(500).json({
+      message: "Internal server error",
+    });
   }
 };
 
 const buildCommentTree = (comments) => {
   const commentMap = {};
-  comments.forEach((comment) => {
-    commentMap[comment.comment_id] = { ...comment, subComments: [] };
-  });
-
   const rootComments = [];
+
   comments.forEach((comment) => {
-    if (comment.parent_comment_id) {
-      const parentComment = commentMap[comment.parent_comment_id];
+    commentMap[comment.id] = { ...comment.dataValues, subComments: [] };
+  });
+  comments.forEach((comment) => {
+    if (comment.dataValues.ParentId) {
+      const parentComment = commentMap[comment.ParentId];
       if (parentComment) {
-        parentComment.subComments.push(commentMap[comment.comment_id]);
+        parentComment.subComments.push(commentMap[comment.id]);
       }
     } else {
-      rootComments.push(commentMap[comment.comment_id]);
+      rootComments.push(commentMap[comment.id]);
     }
   });
   return rootComments;
 };
 
-const extractComments = (comments) => {
-  return comments.map((comment) => {
-    // Extract the relevant data from `dataValues`
-    const {
-      comment_id,
-      title,
-      content,
-      parent_comment_id,
-      user_id,
-      post_id,
-      createdAt,
-      updatedAt,
-      deletedAt,
-    } = comment.dataValues;
-
-    // Recursively process sub-comments
-    const subComments = extractComments(comment.subComments);
-
-    return {
-      comment_id,
-      title,
-      content,
-      parent_comment_id,
-      user_id,
-      post_id,
-      createdAt,
-      updatedAt,
-      deletedAt,
-      subComments,
-    };
-  });
-};
-
-// Usage in your `getCommentsByPostId` function
-const getCommentsByPostId = async (req, res, next) => {
+// Get comments by post ID with optional pagination
+const getCommentsByPostId = async (req, res) => {
   const { post_id } = req.params;
   const {
     page = paginationConfig.defaultPage,
     limit = paginationConfig.defaultLimit,
   } = req.query;
+
   try {
-    // Validate pagination
+    // Validate pagination parameters
     const pagination = validatePagination(page, limit);
     if (pagination.error) {
-      return next(errorHandler(400, pagination.error));
+      return res
+        .status(400)
+        .json({ success: false, message: pagination.error });
     }
+
+    // Check if the post exists
     const post = await db.Post.findByPk(post_id);
     if (!post) {
-      return next(errorHandler(404, "Post not Found"));
+      return res
+        .status(404)
+        .json({ success: false, message: "Post not found" });
     }
-    // Fetch comments with pagination
-    const comments = await db.Comment.findAndCountAll({
-      where: { post_id },
+
+    // Fetch comments for the post with pagination
+    const { count, rows } = await db.Comment.findAndCountAll({
+      where: { PostId: post_id },
       limit: pagination.pageSize,
       offset: (pagination.pageNumber - 1) * pagination.pageSize,
     });
-    // Build the nested structure
-    const rootComments = buildCommentTree(comments.rows);
-    // Extract only the necessary data
-    const filteredComments = extractComments(rootComments);
-    // Calculate nextPage and generate URL
-    const totalPages = Math.ceil(comments.count / pagination.pageSize);
+    const commentsWithSubComments = buildCommentTree(rows);
+    // Calculate pagination details
+    const totalPages = Math.ceil(count / pagination.pageSize);
     const nextPage =
       pagination.pageNumber < totalPages ? pagination.pageNumber + 1 : null;
     const nextPageUrl = generateNextPageUrl(nextPage, pagination.pageSize, req);
 
     return res.status(200).json({
-      total: comments.count,
+      success: true,
+      total: count,
       page: pagination.pageNumber,
       pageSize: pagination.pageSize,
       nextPage: nextPageUrl,
-      comments: filteredComments,
+      comments: commentsWithSubComments,
     });
   } catch (error) {
-    return next(errorHandler(500, "Internal server error"));
+    console.error(error.message); // Optional: log the error message
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 };
 
 // Utility function to get comments by post ID for use in post.comment.controller.js
-const getCommentsByPostIdData = async (post_id) => {
+const getCommentsByPostIdData = async (PostId) => {
   try {
-    const comments = await db.Comment.findAll({ where: { post_id } });
+    const comments = await db.Comment.findAll({ where: { PostId } });
     const rootComments = buildCommentTree(comments);
-    return extractComments(rootComments);
+    return rootComments;
   } catch (error) {
     throw new Error("Internal server error");
   }
 };
 
 // Get a single comment by ID
-const getCommentById = async (req, res, next) => {
+const getCommentById = async (req, res) => {
   const { comment_id } = req.params;
 
   try {
     const comment = await db.Comment.findByPk(comment_id);
     if (!comment) {
-      return next(errorHandler(404, "Comment not Found"));
+      return res.status(404).json({
+        message: "Comment not Found",
+      });
     }
     return res.status(200).json(comment);
   } catch (error) {
-    return next(errorHandler(500, "Internal server error"));
+    return res.status(500).json({
+      message: "Internal server error",
+    });
   }
 };
 
 // Update a comment
-const updateComment = async (req, res, next) => {
+const updateComment = async (req, res) => {
   const { comment_id } = req.params;
   const { title, content } = req.body;
-  const { user_id } = req.user;
+  const { id } = req.user;
 
   try {
     const comment = await db.Comment.findByPk(comment_id);
     if (!comment) {
-      return next(errorHandler(404, "Comment not Found"));
+      return res.status(404).json({
+        message: "Comment not Found",
+      });
     }
-    if (comment.user_id !== user_id) {
-      return next(errorHandler(403, "ForBidden"));
+    if (comment.UserId !== id) {
+      return res.status(403).json({
+        message: "Forbidden",
+      });
     }
 
     comment.title = title || comment.title;
@@ -185,53 +173,60 @@ const updateComment = async (req, res, next) => {
 
     return res.status(200).json(comment);
   } catch (error) {
-    return next(errorHandler(500, "Internal server error"));
+    return res.status(500).json({
+      message: "Internal server error",
+    });
   }
 };
 
 // Delete a comment
-const deleteComment = async (req, res, next) => {
+const deleteComment = async (req, res) => {
   const { comment_id } = req.params;
-  const { user_id } = req.user;
+  const { id } = req.user;
 
   try {
     const comment = await db.Comment.findByPk(comment_id);
     if (!comment) {
-      return next(errorHandler(404, "Comment not Found"));
+      return res.status(404).json({
+        message: "Comment not Found",
+      });
     }
-    if (comment.user_id !== user_id) {
-      return next(errorHandler(403, "ForBidden"));
+    if (comment.UserId !== id) {
+      return res.status(403).json({
+        message: "Forbidden",
+      });
     }
-    // await db.Comment.destroy({
-    //   where: { parent_comment_id: comment_id },
-    // });
     await comment.destroy();
     return res.status(200).json({ message: "Comment deleted successfully" });
   } catch (error) {
-    return next(errorHandler(500, "Internal server error"));
+    return res.status(500).json({
+      message: "Internal server error",
+    });
   }
 };
 
 // Search comments by title or content
-const searchCommentsByTitleOrContent = async (req, res, next) => {
+const searchCommentsByTitleOrContent = async (req, res) => {
   const {
-    title,
-    content,
+    title = "",
+    content = "",
     page = paginationConfig.defaultPage,
     limit = paginationConfig.defaultLimit,
   } = req.query;
 
   try {
     if (!title && !content) {
-      return next(
-        errorHandler(400, "Title or content query parameter is required")
-      );
+      return res.status(400).json({
+        message: "Title or content query parameter is required",
+      });
     }
 
     // Validate pagination
     const pagination = validatePagination(page, limit);
     if (pagination.error) {
-      return next(errorHandler(400, pagination.error));
+      return res.status(400).json({
+        message: pagination.error,
+      });
     }
 
     // Fetch comments with pagination
@@ -245,13 +240,12 @@ const searchCommentsByTitleOrContent = async (req, res, next) => {
       limit: pagination.pageSize,
       offset: (pagination.pageNumber - 1) * pagination.pageSize,
     });
-
     // Calculate nextPage and generate URL
     const totalPages = Math.ceil(comments.count / pagination.pageSize);
     const nextPage =
       pagination.pageNumber < totalPages ? pagination.pageNumber + 1 : null;
     const nextPageUrl = generateNextPageUrl(nextPage, pagination.pageSize, req);
-
+    console.log(nextPageUrl);
     return res.status(200).json({
       total: comments.count,
       page: pagination.pageNumber,
@@ -260,16 +254,18 @@ const searchCommentsByTitleOrContent = async (req, res, next) => {
       comments: comments.rows,
     });
   } catch (error) {
-    return next(errorHandler(500, "Internal server error"));
+    return res.status(500).json({
+      message: "Internal server error",
+    });
   }
 };
 
-module.exports = {
+export {
   createComment,
   getCommentsByPostId,
   getCommentById,
   updateComment,
   deleteComment,
-  getCommentsByPostIdData,
   searchCommentsByTitleOrContent,
+  getCommentsByPostIdData,
 };

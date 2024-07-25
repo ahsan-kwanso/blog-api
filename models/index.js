@@ -11,10 +11,16 @@ const db = {};
 const config = configFile[env];
 dotenv.config();
 let sequelize;
-if (env == "production") {
-  sequelize = new Sequelize(process.env.DATABASE_URL, {
+if (env === "production") {
+  sequelize = new Sequelize(config.production_db_url, {
     dialect: config.dialect,
-    dialectModule: pg,
+    protocol: config.dialect,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false, // For Heroku, you may need to adjust SSL settings
+      },
+    },
   });
 } else {
   sequelize = new Sequelize(config.database, config.username, config.password, {

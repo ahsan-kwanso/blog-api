@@ -8,12 +8,37 @@ import {
   deletePost,
 } from "../controllers/post.controller.js";
 
+import {
+  createPostValidationRules,
+  updatePostValidationRules,
+  deletePostValidationRules,
+  validate,
+} from "../validators/post.validator.js";
+
 const router = express.Router();
 
-router.post("/", authenticateJWT, createPost);
+router.post(
+  "/",
+  authenticateJWT,
+  createPostValidationRules,
+  validate,
+  createPost
+);
 router.get("/", authenticateJWT, getPosts);
 router.get("/:post_id", authenticateJWT, getPostById);
-router.put("/:post_id", authenticateJWT, updatePost);
-router.delete("/:post_id", authenticateJWT, deletePost);
+router.put(
+  "/:post_id",
+  authenticateJWT,
+  updatePostValidationRules,
+  validate,
+  updatePost
+);
+router.delete(
+  "/:post_id",
+  authenticateJWT,
+  deletePostValidationRules,
+  validate,
+  deletePost
+);
 
 export default router;

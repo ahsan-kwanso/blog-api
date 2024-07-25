@@ -5,10 +5,6 @@ import {
 } from "../utils/pagination.js";
 
 const createPostService = async (title, content, userId) => {
-  if (!title || !content) {
-    throw new Error("Title and content are required");
-  }
-
   const post = await Post.create({ title, content, UserId: userId });
   return post;
 };

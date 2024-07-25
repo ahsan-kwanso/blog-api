@@ -30,6 +30,14 @@ Object.keys(db).forEach((modelName) => {
     db[modelName].associate(db);
   }
 });
+
+const User = db.User;
+const Post = db.Post;
+const Comment = db.Comment;
+
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
+
 export default db;
+
+export { User, Post, Comment };

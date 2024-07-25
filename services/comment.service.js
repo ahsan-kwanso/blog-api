@@ -178,6 +178,16 @@ const searchCommentsByTitleOrContentService = async (
   };
 };
 
+const getCommentsByPostIdDataService = async (PostId) => {
+  try {
+    const comments = await Comment.findAll({ where: { PostId } });
+    const rootComments = buildCommentTree(comments);
+    return rootComments;
+  } catch (error) {
+    throw new Error("Internal server error!");
+  }
+};
+
 export {
   createCommentService,
   getCommentsByPostIdService,
@@ -185,16 +195,5 @@ export {
   updateCommentService,
   deleteCommentService,
   searchCommentsByTitleOrContentService,
+  getCommentsByPostIdDataService,
 };
-
-/**
- * const getCommentsByPostIdData = async (PostId) => {
-  try {
-    const comments = await db.Comment.findAll({ where: { PostId } });
-    const rootComments = buildCommentTree(comments);
-    return rootComments;
-  } catch (error) {
-    throw new Error("Internal server error");
-  }
-};
- */

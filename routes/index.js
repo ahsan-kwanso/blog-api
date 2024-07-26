@@ -8,6 +8,6 @@ const router = express.Router();
 router.use("/auth", authRoutes);
 router.use("/posts", postRoutes);
 router.use("/comments", commentRoutes);
-router.use("/posts-comments", postCommentRoutes);
+router.use("/post/comments", postCommentRoutes);
 
 export default router;

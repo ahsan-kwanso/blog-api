@@ -3,7 +3,6 @@ import {
   getPostsByUserWithCommentsService,
   searchPostsByTitleOrContentService,
 } from "../services/post.comment.service.js";
-import paginationConfig from "../config/pagination.config.js";
 
 // Get posts with nested comments
 const getPostsWithComments = async (req, res) => {

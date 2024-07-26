@@ -41,6 +41,6 @@ router.delete(
   validate,
   deleteComment
 );
-router.get("", authenticateJWT, searchCommentsByTitleOrContent);
+router.get("/", authenticateJWT, searchCommentsByTitleOrContent);
 
 export default router;

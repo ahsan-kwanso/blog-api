@@ -13,6 +13,6 @@ router.get("/", authenticateJWT, getPostsWithComments);
 
 // Route to get posts by user with nested comments
 router.get("/user/:user_id", authenticateJWT, getPostsByUserWithComments);
-router.get("/search", authenticateJWT, searchPostsByTitleOrContent);
+router.get("/", authenticateJWT, searchPostsByTitleOrContent);
 
 export default router;

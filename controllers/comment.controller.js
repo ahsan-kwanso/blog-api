@@ -6,7 +6,6 @@ import {
   deleteCommentService,
   searchCommentsByTitleOrContentService,
 } from "../services/comment.service.js";
-import paginationConfig from "../config/pagination.config.js";
 // Create a new comment
 const createComment = async (req, res) => {
   const { title, content, PostId, ParentId } = req.body;
@@ -30,14 +29,8 @@ const createComment = async (req, res) => {
 
 // Get comments by post ID with optional pagination
 const getCommentsByPostId = async (req, res) => {
-  const { post_id } = req.params;
-  const {
-    page = paginationConfig.defaultPage,
-    limit = paginationConfig.defaultLimit,
-  } = req.query;
-
   try {
-    const data = await getCommentsByPostIdService(post_id, page, limit, req);
+    const data = await getCommentsByPostIdService(req);
     return res.status(200).json(data);
   } catch (error) {
     return res
@@ -98,21 +91,8 @@ const deleteComment = async (req, res) => {
 
 // Search comments by title or content
 const searchCommentsByTitleOrContent = async (req, res) => {
-  const {
-    title = "",
-    content = "",
-    page = paginationConfig.defaultPage,
-    limit = paginationConfig.defaultLimit,
-  } = req.query;
-
   try {
-    const data = await searchCommentsByTitleOrContentService(
-      title,
-      content,
-      page,
-      limit,
-      req
-    );
+    const data = await searchCommentsByTitleOrContentService(req);
     return res.status(200).json(data);
   } catch (error) {
     return res

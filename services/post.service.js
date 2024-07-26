@@ -3,13 +3,19 @@ import {
   validatePagination,
   generateNextPageUrl,
 } from "../utils/pagination.js";
+import paginationConfig from "../config/pagination.config.js";
 
 const createPostService = async (title, content, userId) => {
   const post = await Post.create({ title, content, UserId: userId });
   return post;
 };
 
-const getPostsService = async (page, limit, req) => {
+const getPostsService = async (req) => {
+  const {
+    page = paginationConfig.defaultPage,
+    limit = paginationConfig.defaultLimit,
+  } = req.query;
+
   // Validate pagination parameters
   const pagination = validatePagination(page, limit);
   if (pagination.error) {

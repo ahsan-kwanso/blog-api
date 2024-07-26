@@ -7,13 +7,8 @@ import paginationConfig from "../config/pagination.config.js";
 
 // Get posts with nested comments
 const getPostsWithComments = async (req, res) => {
-  const {
-    page = paginationConfig.defaultPage,
-    limit = paginationConfig.defaultLimit,
-  } = req.query;
-
   try {
-    const data = await getPostsWithCommentsService(page, limit, req);
+    const data = await getPostsWithCommentsService(req);
     return res.status(200).json(data);
   } catch (error) {
     return res
@@ -24,21 +19,8 @@ const getPostsWithComments = async (req, res) => {
 
 // Get posts by user with nested comments
 const getPostsByUserWithComments = async (req, res) => {
-  const { user_id } = req.params;
-  const {
-    page = paginationConfig.defaultPage,
-    limit = paginationConfig.defaultLimit,
-  } = req.query;
-  const { id } = req.user;
-
   try {
-    const data = await getPostsByUserWithCommentsService(
-      user_id,
-      page,
-      limit,
-      req,
-      id
-    );
+    const data = await getPostsByUserWithCommentsService(req);
     return res.status(200).json(data);
   } catch (error) {
     return res
@@ -49,21 +31,8 @@ const getPostsByUserWithComments = async (req, res) => {
 
 // Search posts by title or content
 const searchPostsByTitleOrContent = async (req, res) => {
-  const {
-    title = "",
-    content = "",
-    page = paginationConfig.defaultPage,
-    limit = paginationConfig.defaultLimit,
-  } = req.query;
-
   try {
-    const data = await searchPostsByTitleOrContentService(
-      title,
-      content,
-      page,
-      limit,
-      req
-    );
+    const data = await searchPostsByTitleOrContentService(req);
     return res.status(200).json(data);
   } catch (error) {
     return res

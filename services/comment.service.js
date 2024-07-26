@@ -3,7 +3,7 @@ import {
   validatePagination,
   generateNextPageUrl,
 } from "../utils/pagination.js";
-
+import paginationConfig from "../config/pagination.config.js";
 // Create a new comment
 const createCommentService = async (
   title,
@@ -60,7 +60,12 @@ const buildCommentTree = (comments) => {
 };
 
 // Get comments by post ID with optional pagination
-const getCommentsByPostIdService = async (post_id, page, limit, req) => {
+const getCommentsByPostIdService = async (req) => {
+  const { post_id } = req.params;
+  const {
+    page = paginationConfig.defaultPage,
+    limit = paginationConfig.defaultLimit,
+  } = req.query;
   const pagination = validatePagination(page, limit);
   if (pagination.error) {
     throw new Error(pagination.error);
@@ -133,13 +138,14 @@ const deleteCommentService = async (comment_id, UserId) => {
 };
 
 // Search comments by title or content
-const searchCommentsByTitleOrContentService = async (
-  title,
-  content,
-  page,
-  limit,
-  req
-) => {
+const searchCommentsByTitleOrContentService = async (req) => {
+  const {
+    title = "",
+    content = "",
+    page = paginationConfig.defaultPage,
+    limit = paginationConfig.defaultLimit,
+  } = req.query;
+
   const pagination = validatePagination(page, limit);
   if (pagination.error) {
     throw new Error(pagination.error);

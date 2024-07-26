@@ -5,7 +5,6 @@ import {
   updatePostService,
   deletePostService,
 } from "../services/post.service.js";
-import paginationConfig from "../config/pagination.config.js";
 
 const createPost = async (req, res) => {
   const { title, content } = req.body;
@@ -22,13 +21,8 @@ const createPost = async (req, res) => {
 };
 
 const getPosts = async (req, res) => {
-  const {
-    page = paginationConfig.defaultPage,
-    limit = paginationConfig.defaultLimit,
-  } = req.query;
-
   try {
-    const data = await getPostsService(page, limit, req);
+    const data = await getPostsService(req);
     res.status(200).json({
       total: data.total,
       page: data.page,

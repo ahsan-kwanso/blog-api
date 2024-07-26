@@ -4,6 +4,7 @@ import {
   validatePagination,
   generateNextPageUrl,
 } from "../utils/pagination.js";
+import paginationConfig from "../config/pagination.config.js";
 
 // Utility function to get posts with nested comments
 const getPostsWithNestedCommentsService = async (posts) => {
@@ -40,7 +41,12 @@ const formatPaginationResponse = (
 };
 
 // Get posts with nested comments
-const getPostsWithCommentsService = async (page, limit, req) => {
+const getPostsWithCommentsService = async (req) => {
+  const {
+    page = paginationConfig.defaultPage,
+    limit = paginationConfig.defaultLimit,
+  } = req.query;
+
   const pagination = validatePagination(page, limit);
   if (pagination.error) {
     throw new Error(pagination.error);
@@ -64,14 +70,14 @@ const getPostsWithCommentsService = async (page, limit, req) => {
 };
 
 // Get posts by user with nested comments
-const getPostsByUserWithCommentsService = async (
-  user_id,
-  page,
-  limit,
-  req,
-  authenticatedUserId
-) => {
-  if (parseInt(user_id) !== authenticatedUserId) {
+const getPostsByUserWithCommentsService = async (req) => {
+  const { user_id } = req.params;
+  const {
+    page = paginationConfig.defaultPage,
+    limit = paginationConfig.defaultLimit,
+  } = req.query;
+  const { id } = req.user;
+  if (parseInt(user_id) !== id) {
     throw new Error("Forbidden");
   }
 
@@ -99,13 +105,13 @@ const getPostsByUserWithCommentsService = async (
 };
 
 // Search posts by title or content
-const searchPostsByTitleOrContentService = async (
-  title,
-  content,
-  page,
-  limit,
-  req
-) => {
+const searchPostsByTitleOrContentService = async (req) => {
+  const {
+    title = "",
+    content = "",
+    page = paginationConfig.defaultPage,
+    limit = paginationConfig.defaultLimit,
+  } = req.query;
   if (!title && !content) {
     throw new Error("Title or content query parameter is required");
   }

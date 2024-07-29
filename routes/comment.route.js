@@ -14,6 +14,8 @@ import {
   updateCommentValidationRules,
   deleteCommentValidationRules,
   validate,
+  getCommentByIdValidationRules,
+  getCommentByPostIdValidationRules,
 } from "../validators/comment.validator.js";
 
 const router = express.Router();
@@ -25,8 +27,23 @@ router.post(
   validate,
   createComment
 );
-router.get("/post/:post_id", authenticateJWT, getCommentsByPostId);
-router.get("/:comment_id", authenticateJWT, getCommentById);
+
+router.get(
+  "/post/:post_id",
+  authenticateJWT,
+  getCommentByPostIdValidationRules,
+  validate,
+  getCommentsByPostId
+);
+
+router.get(
+  "/:comment_id",
+  authenticateJWT,
+  getCommentByIdValidationRules,
+  validate,
+  getCommentById
+);
+
 router.put(
   "/:comment_id",
   authenticateJWT,
@@ -34,6 +51,7 @@ router.put(
   validate,
   updateComment
 );
+
 router.delete(
   "/:comment_id",
   authenticateJWT,
@@ -41,6 +59,7 @@ router.delete(
   validate,
   deleteComment
 );
+
 router.get("/", authenticateJWT, searchCommentsByTitleOrContent);
 
 export default router;

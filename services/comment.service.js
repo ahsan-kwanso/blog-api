@@ -1,9 +1,9 @@
-import { Comment, Post, Sequelize } from "../models/index.js";
+import { Comment, Post, Sequelize } from "../sequelize/models/index.js";
 import {
   validatePagination,
   generateNextPageUrl,
 } from "../utils/pagination.js";
-import paginationConfig from "../config/pagination.config.js";
+import paginationConfig from "../sequelize/config/pagination.config.js";
 // Create a new comment
 const createCommentService = async (
   title,

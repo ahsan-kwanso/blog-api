@@ -1,9 +1,9 @@
-import { Post } from "../models/index.js";
+import { Post } from "../sequelize/models/index.js";
 import {
   validatePagination,
   generateNextPageUrl,
 } from "../utils/pagination.js";
-import paginationConfig from "../config/pagination.config.js";
+import paginationConfig from "../sequelize/config/pagination.config.js";
 
 const createPostService = async (title, content, userId) => {
   const post = await Post.create({ title, content, UserId: userId });

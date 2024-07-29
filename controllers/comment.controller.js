@@ -14,23 +14,23 @@ const createComment = async (req, res) => {
   const { id } = req.user; // Extract UserId from authenticated user
 
   try {
-    const comment = await createCommentService(
+    const result = await createCommentService(
       title,
       content,
       PostId,
       ParentId,
       id
     );
-    if (!comment.success) {
-      if (comment.message === "Post not Found")
+    if (!result.success) {
+      if (result.message === "Post not Found")
         return res
           .status(statusCodes.NOT_FOUND)
-          .json({ message: comment.message });
+          .json({ message: result.message });
       return res
         .status(statusCodes.BAD_REQUEST)
-        .json({ message: comment.message });
+        .json({ message: result.message });
     }
-    return res.status(statusCodes.CREATED).json(comment);
+    return res.status(statusCodes.CREATED).json(result.comment);
   } catch (error) {
     return res
       .status(statusCodes.INTERNAL_SERVER_ERROR)

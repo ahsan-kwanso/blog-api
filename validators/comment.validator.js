@@ -1,4 +1,4 @@
-import { body, check, param, validationResult } from "express-validator";
+import { body, query, param, validationResult } from "express-validator";
 
 // Create Comment Validation Rules
 const createCommentValidationRules = [
@@ -27,6 +27,14 @@ const getCommentByPostIdValidationRules = [
   param("post_id").isInt().withMessage("Valid post ID is required"),
 ];
 
+const searchByTitleOrContentValidator = [
+  query("title").optional().isString().withMessage("Title must be a string"),
+  query("content")
+    .optional()
+    .isString()
+    .withMessage("Content must be a string"),
+];
+
 // Validate function
 const validate = (req, res, next) => {
   const errors = validationResult(req);
@@ -42,6 +50,7 @@ export {
   deleteCommentValidationRules,
   getCommentByIdValidationRules,
   getCommentByPostIdValidationRules,
+  searchByTitleOrContentValidator,
   validate,
 };
 

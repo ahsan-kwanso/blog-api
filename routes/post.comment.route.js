@@ -5,6 +5,11 @@ import {
   getPostsByUserWithComments,
   searchPostsByTitleOrContent,
 } from "../controllers/post.comment.controller.js";
+import {
+  getPostsByUserWithCommentsValidator,
+  searchByTitleOrContentValidator,
+  validate,
+} from "../validators/post.validator.js";
 
 const router = express.Router();
 
@@ -12,7 +17,19 @@ const router = express.Router();
 router.get("/", authenticateJWT, getPostsWithComments);
 
 // Route to get posts by user with nested comments
-router.get("/user/:user_id", authenticateJWT, getPostsByUserWithComments);
-router.get("/", authenticateJWT, searchPostsByTitleOrContent);
+router.get(
+  "/user/:user_id",
+  authenticateJWT,
+  getPostsByUserWithCommentsValidator,
+  validate,
+  getPostsByUserWithComments
+);
+router.get(
+  "/",
+  authenticateJWT,
+  searchByTitleOrContentValidator,
+  validate,
+  searchPostsByTitleOrContent
+);
 
 export default router;

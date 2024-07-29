@@ -16,6 +16,7 @@ import {
   validate,
   getCommentByIdValidationRules,
   getCommentByPostIdValidationRules,
+  searchByTitleOrContentValidator,
 } from "../validators/comment.validator.js";
 
 const router = express.Router();
@@ -60,6 +61,12 @@ router.delete(
   deleteComment
 );
 
-router.get("/", authenticateJWT, searchCommentsByTitleOrContent);
+router.get(
+  "/",
+  authenticateJWT,
+  searchByTitleOrContentValidator,
+  validate,
+  searchCommentsByTitleOrContent
+);
 
 export default router;

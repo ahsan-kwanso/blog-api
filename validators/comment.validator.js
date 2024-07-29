@@ -1,5 +1,5 @@
 import { body, query, param, validationResult } from "express-validator";
-
+import { statusCodes } from "../utils/statusCodes.js";
 // Create Comment Validation Rules
 const createCommentValidationRules = [
   body("PostId").isInt().withMessage("Valid PostId is required"),
@@ -39,7 +39,7 @@ const searchByTitleOrContentValidator = [
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return res.status(statusCodes.BAD_REQUEST).json({ errors: errors.array() });
   }
   next();
 };

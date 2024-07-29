@@ -49,7 +49,7 @@ const getPostsWithCommentsService = async (req) => {
 
   const pagination = validatePagination(page, limit);
   if (pagination.error) {
-    throw new Error(pagination.error);
+    return { success: false, message: pagination.error };
   }
 
   const posts = await Post.findAll({
@@ -60,13 +60,14 @@ const getPostsWithCommentsService = async (req) => {
   const postsWithComments = await getPostsWithNestedCommentsService(posts);
   const totalPosts = await Post.count();
 
-  return formatPaginationResponse(
+  const data = formatPaginationResponse(
     postsWithComments,
     totalPosts,
     pagination.pageNumber,
     pagination.pageSize,
     req
   );
+  return { success: true, data: data };
 };
 
 // Get posts by user with nested comments
@@ -78,12 +79,12 @@ const getPostsByUserWithCommentsService = async (req) => {
   } = req.query;
   const { id } = req.user;
   if (parseInt(user_id) !== id) {
-    throw new Error("Forbidden");
+    return { success: false, message: "ForBidden" };
   }
 
   const pagination = validatePagination(page, limit);
   if (pagination.error) {
-    throw new Error(pagination.error);
+    return { success: false, message: pagination.error };
   }
 
   const posts = await Post.findAll({
@@ -95,13 +96,14 @@ const getPostsByUserWithCommentsService = async (req) => {
   const postsWithComments = await getPostsWithNestedCommentsService(posts);
   const totalPosts = await Post.count({ where: { UserId: user_id } });
 
-  return formatPaginationResponse(
+  const data = formatPaginationResponse(
     postsWithComments,
     totalPosts,
     pagination.pageNumber,
     pagination.pageSize,
     req
   );
+  return { success: true, data: data };
 };
 
 // Search posts by title or content
@@ -113,12 +115,15 @@ const searchPostsByTitleOrContentService = async (req) => {
     limit = paginationConfig.defaultLimit,
   } = req.query;
   if (!title && !content) {
-    throw new Error("Title or content query parameter is required");
+    return {
+      success: false,
+      message: "Title or content query parameter is required",
+    };
   }
 
   const pagination = validatePagination(page, limit);
   if (pagination.error) {
-    throw new Error(pagination.error);
+    return { success: false, message: pagination.error };
   }
 
   const posts = await Post.findAndCountAll({
@@ -133,13 +138,14 @@ const searchPostsByTitleOrContentService = async (req) => {
   });
 
   const postsWithComments = await getPostsWithNestedCommentsService(posts.rows);
-  return formatPaginationResponse(
+  const data = formatPaginationResponse(
     postsWithComments,
     posts.count,
     pagination.pageNumber,
     pagination.pageSize,
     req
   );
+  return { success: true, data: data };
 };
 
 export {

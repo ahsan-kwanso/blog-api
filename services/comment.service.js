@@ -1,9 +1,13 @@
-import { Comment, Post, Sequelize } from "../sequelize/models/index.js";
+//import Comment from "../sequelize/models/comment.model.js";
+import Post from "../sequelize/models/post.model.js";
+import db from "../sequelize/models/index.js";
+import { Sequelize } from "sequelize";
 import {
   validatePagination,
   generateNextPageUrl,
 } from "../utils/pagination.js";
 import paginationConfig from "../sequelize/config/pagination.config.js";
+const Comment = db.Comment;
 // Create a new comment
 const createCommentService = async (
   title,
@@ -40,7 +44,6 @@ const createCommentService = async (
     PostId,
     ParentId,
   });
-
   return { success: true, comment: comment };
 };
 

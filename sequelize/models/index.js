@@ -1,24 +1,21 @@
-import { sequelize, Sequelize } from "../config/sequelize.js";
-import userModel from "./user.model.js";
-import postModel from "./post.model.js";
-import commentModel from "./comment.model.js";
+import { sequelize } from "../config/sequelize.js";
+import { Sequelize } from "sequelize";
+import User from "./user.model.js";
+import Post from "./post.model.js";
+import Comment from "./comment.model.js";
 
 const db = {};
 
-db.User = userModel(sequelize, Sequelize.DataTypes);
-db.Post = postModel(sequelize, Sequelize.DataTypes);
-db.Comment = commentModel(sequelize, Sequelize.DataTypes);
+db.User = User;
+db.Post = Post;
+db.Comment = Comment;
 
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
   }
 });
-
-const User = db.User;
-const Post = db.Post;
-const Comment = db.Comment;
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
 
 export default db;
-
-export { User, Post, Comment, Sequelize, sequelize };

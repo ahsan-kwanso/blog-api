@@ -1,4 +1,5 @@
-import { Post } from "../sequelize/models/index.js";
+//import { Post } from "../sequelize/models/index.js";
+import Post from "../sequelize/models/post.model.js";
 import {
   validatePagination,
   generateNextPageUrl,

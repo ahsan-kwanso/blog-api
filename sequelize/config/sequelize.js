@@ -26,4 +26,4 @@ if (env === "production") {
   });
 }
 
-export { sequelize, Sequelize };
+export { sequelize };

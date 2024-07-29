@@ -1,11 +1,11 @@
-import { Sequelize, Post } from "../sequelize/models/index.js";
+import { Sequelize } from "sequelize";
+import Post from "../sequelize/models/post.model.js";
 import { getCommentsByPostIdDataService } from "./comment.service.js";
 import {
   validatePagination,
   generateNextPageUrl,
 } from "../utils/pagination.js";
 import paginationConfig from "../sequelize/config/pagination.config.js";
-
 // Utility function to get posts with nested comments
 const getPostsWithNestedCommentsService = async (posts) => {
   return await Promise.all(

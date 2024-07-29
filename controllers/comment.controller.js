@@ -19,23 +19,23 @@ const createComment = async (req, res) => {
       ParentId,
       id
     );
+    if (!comment.success)
+      return res.status(400).json({ message: comment.message });
     return res.status(201).json(comment);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: error.message || "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
-// Get comments by post ID with optional pagination
+// Get comments by post ID
 const getCommentsByPostId = async (req, res) => {
   try {
-    const data = await getCommentsByPostIdService(req);
-    return res.status(200).json(data);
+    const comments = await getCommentsByPostIdService(req);
+    if (!comments.success)
+      return res.status(400).json({ message: comments.message });
+    return res.status(200).json(comments.data);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: error.message || "Internal server error" });
+    return res.status(500).json({ message: "Internal server error. " });
   }
 };
 
@@ -44,15 +44,13 @@ const getCommentById = async (req, res) => {
   const { comment_id } = req.params;
 
   try {
-    const comment = await getCommentByIdService(comment_id);
-    return res.status(200).json(comment);
+    const result = await getCommentByIdService(comment_id);
+    if (!result.success) res.status(400).json({ message: result.message });
+    return res.status(200).json(result.comment);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: error.message || "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 // Update a comment
 const updateComment = async (req, res) => {
   const { comment_id } = req.params;
@@ -60,17 +58,12 @@ const updateComment = async (req, res) => {
   const { id } = req.user;
 
   try {
-    const updatedComment = await updateCommentService(
-      comment_id,
-      title,
-      content,
-      id
-    );
-    return res.status(200).json(updatedComment);
+    const result = await updateCommentService(comment_id, title, content, id);
+    if (!result.success)
+      return res.status(400).json({ message: result.message });
+    return res.status(200).json(result.comment);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: error.message || "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -80,20 +73,22 @@ const deleteComment = async (req, res) => {
   const { id } = req.user;
 
   try {
-    const response = await deleteCommentService(comment_id, id);
-    return res.status(200).json(response);
+    const result = await deleteCommentService(comment_id, id);
+    if (!result.success)
+      return res.status(400).json({ message: result.message });
+    return res.status(200).json({ message: result.message });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: error.message || "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
 // Search comments by title or content
 const searchCommentsByTitleOrContent = async (req, res) => {
   try {
-    const data = await searchCommentsByTitleOrContentService(req);
-    return res.status(200).json(data);
+    const result = await searchCommentsByTitleOrContentService(req);
+    if (!result.success)
+      return res.status(400).json({ message: result.message });
+    return res.status(200).json(result.data);
   } catch (error) {
     return res
       .status(500)

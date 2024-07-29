@@ -14,16 +14,22 @@ const createCommentService = async (
 ) => {
   const post = await Post.findByPk(PostId);
   if (!post) {
-    throw new Error("Post not Found");
+    return { success: false, message: "Post not Found" };
   }
 
   if (ParentId) {
     const parentComment = await Comment.findByPk(ParentId);
     if (parentComment && parentComment.PostId !== PostId) {
-      throw new Error(`This comment is not on post ${PostId}`);
+      return {
+        success: false,
+        message: `This comment is not on post ${PostId}`,
+      };
     }
     if (!parentComment) {
-      throw new Error("You can't reply to a non-existing comment");
+      return {
+        success: false,
+        message: "You can't reply to a non-existing comment",
+      };
     }
   }
 
@@ -35,7 +41,7 @@ const createCommentService = async (
     ParentId,
   });
 
-  return comment;
+  return { success: true, comment: comment };
 };
 
 // Build comment tree for nested comments
@@ -68,12 +74,12 @@ const getCommentsByPostIdService = async (req) => {
   } = req.query;
   const pagination = validatePagination(page, limit);
   if (pagination.error) {
-    throw new Error(pagination.error);
+    return { success: false, message: pagination.error };
   }
 
   const post = await Post.findByPk(post_id);
   if (!post) {
-    throw new Error("Post not found");
+    return { success: false, message: "Post not Found" };
   }
 
   const comments = await Comment.findAndCountAll({
@@ -86,55 +92,56 @@ const getCommentsByPostIdService = async (req) => {
   const nextPage =
     pagination.pageNumber < totalPages ? pagination.pageNumber + 1 : null;
 
-  return {
+  const data = {
     total: comments.count,
     page: pagination.pageNumber,
     pageSize: pagination.pageSize,
     nextPageUrl: generateNextPageUrl(nextPage, pagination.pageSize, req),
     comments: commentsWithSubComments,
   };
+  return { success: true, data: data };
 };
 
 // Get a single comment by ID
 const getCommentByIdService = async (comment_id) => {
   const comment = await Comment.findByPk(comment_id);
   if (!comment) {
-    throw new Error("Comment not Found");
+    return { success: false, message: "Comment not Found" };
   }
-  return comment;
+  return { success: true, comment: comment };
 };
 
 // Update a comment
 const updateCommentService = async (comment_id, title, content, UserId) => {
   const comment = await Comment.findByPk(comment_id);
   if (!comment) {
-    throw new Error("Comment not Found");
+    return { success: false, message: "Comment not Found" };
   }
 
   if (comment.UserId !== UserId) {
-    throw new Error("Forbidden");
+    return { success: false, message: "ForBidden" };
   }
 
   comment.title = title || comment.title;
   comment.content = content || comment.content;
   await comment.save();
 
-  return comment;
+  return { success: true, comment: comment };
 };
 
 // Delete a comment
 const deleteCommentService = async (comment_id, UserId) => {
   const comment = await Comment.findByPk(comment_id);
   if (!comment) {
-    throw new Error("Comment not Found");
+    return { success: false, message: "Comment not Found" };
   }
 
   if (comment.UserId !== UserId) {
-    throw new Error("Forbidden");
+    return { success: false, message: "ForBidden" };
   }
 
   await comment.destroy();
-  return { message: "Comment deleted successfully" };
+  return { success: true, message: "Comment deleted successfully" };
 };
 
 // Search comments by title or content
@@ -148,11 +155,14 @@ const searchCommentsByTitleOrContentService = async (req) => {
 
   const pagination = validatePagination(page, limit);
   if (pagination.error) {
-    throw new Error(pagination.error);
+    return { success: false, message: pagination.error };
   }
 
   if (!title && !content) {
-    throw new Error("Title or content query parameter is required");
+    return {
+      success: false,
+      message: "Title or content query parameter is required",
+    };
   }
 
   const comments = await Comment.findAndCountAll({
@@ -170,13 +180,14 @@ const searchCommentsByTitleOrContentService = async (req) => {
   const nextPage =
     pagination.pageNumber < totalPages ? pagination.pageNumber + 1 : null;
 
-  return {
+  const data = {
     total: comments.count,
     page: pagination.pageNumber,
     pageSize: pagination.pageSize,
     nextPageUrl: generateNextPageUrl(nextPage, pagination.pageSize, req),
     comments: comments.rows,
   };
+  return { success: true, data: data };
 };
 
 const getCommentsByPostIdDataService = async (PostId) => {

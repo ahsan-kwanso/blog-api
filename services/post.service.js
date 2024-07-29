@@ -45,38 +45,38 @@ const getPostsService = async (req) => {
 const getPostByIdService = async (postId) => {
   const post = await Post.findByPk(postId);
   if (!post) {
-    throw new Error("Post not found");
+    return { success: false, message: "Post not Found" };
   }
-  return post;
+  return { success: true, post: post };
 };
 
 const updatePostService = async (postId, title, content, userId) => {
   const post = await Post.findByPk(postId);
   if (!post) {
-    throw new Error("Post not found");
+    return { success: false, message: "Post not Found" };
   }
   if (post.UserId !== userId) {
-    throw new Error("Forbidden");
+    return { success: false, message: "ForBidden" };
   }
 
   post.title = title || post.title;
   post.content = content || post.content;
   await post.save();
 
-  return post;
+  return { success: true, post: post };
 };
 
 const deletePostService = async (postId, userId) => {
   const post = await Post.findByPk(postId);
   if (!post) {
-    throw new Error("Post not found");
+    return { success: false, message: "Post not Found" };
   }
   if (post.UserId !== userId) {
-    throw new Error("Forbidden");
+    return { success: false, message: "ForBidden" };
   }
 
   await post.destroy();
-  return "Post deleted successfully";
+  return { success: true, message: "Post deleted successfully" };
 };
 
 export {

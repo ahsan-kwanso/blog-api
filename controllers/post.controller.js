@@ -14,9 +14,7 @@ const createPost = async (req, res) => {
     const post = await createPostService(title, content, id);
     return res.status(201).json({ post });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: error.message || "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -31,9 +29,7 @@ const getPosts = async (req, res) => {
       posts: data.posts,
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: error.message || "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -41,12 +37,12 @@ const getPostById = async (req, res) => {
   const { post_id } = req.params;
 
   try {
-    const post = await getPostByIdService(post_id);
-    return res.status(200).json({ post });
+    const result = await getPostByIdService(post_id);
+    if (!result.success)
+      return res.status(400).json({ message: result.message });
+    return res.status(200).json(result.post);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: error.message || "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -56,12 +52,12 @@ const updatePost = async (req, res) => {
   const { id } = req.user;
 
   try {
-    const post = await updatePostService(post_id, title, content, id);
-    return res.status(200).json({ post });
+    const result = await updatePostService(post_id, title, content, id);
+    if (!result.success)
+      return res.status(400).json({ message: result.message });
+    return res.status(200).json(result.post);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: error.message || "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -70,12 +66,12 @@ const deletePost = async (req, res) => {
   const { id } = req.user;
 
   try {
-    const message = await deletePostService(post_id, id);
-    return res.status(200).json({ message });
+    const result = await deletePostService(post_id, id);
+    if (!result.success)
+      return res.status(400).json({ message: result.message });
+    return res.status(200).json({ message: result.message });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: error.message || "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 

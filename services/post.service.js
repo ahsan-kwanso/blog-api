@@ -19,7 +19,7 @@ const getPostsService = async (req) => {
   // Validate pagination parameters
   const pagination = validatePagination(page, limit);
   if (pagination.error) {
-    throw new Error(pagination.error);
+    return { success: false, message: pagination.error };
   }
 
   // Fetch posts with pagination

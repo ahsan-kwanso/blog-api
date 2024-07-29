@@ -5,6 +5,7 @@ import {
   updatePostService,
   deletePostService,
 } from "../services/post.service.js";
+import { statusCodes } from "../utils/statusCodes.js";
 
 const createPost = async (req, res) => {
   const { title, content } = req.body;
@@ -12,16 +13,18 @@ const createPost = async (req, res) => {
 
   try {
     const post = await createPostService(title, content, id);
-    return res.status(201).json({ post });
+    return res.status(statusCodes.CREATED).json({ post });
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error" });
+    return res
+      .status(statusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 };
 
 const getPosts = async (req, res) => {
   try {
     const data = await getPostsService(req);
-    res.status(200).json({
+    res.status(statusCodes.OK).json({
       total: data.total,
       page: data.page,
       pageSize: data.pageSize,
@@ -29,7 +32,9 @@ const getPosts = async (req, res) => {
       posts: data.posts,
     });
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error" });
+    return res
+      .status(statusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 };
 
@@ -39,10 +44,14 @@ const getPostById = async (req, res) => {
   try {
     const result = await getPostByIdService(post_id);
     if (!result.success)
-      return res.status(400).json({ message: result.message });
-    return res.status(200).json(result.post);
+      return res
+        .status(statusCodes.NOT_FOUND)
+        .json({ message: result.message });
+    return res.status(statusCodes.OK).json(result.post);
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error" });
+    return res
+      .status(statusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 };
 
@@ -53,11 +62,20 @@ const updatePost = async (req, res) => {
 
   try {
     const result = await updatePostService(post_id, title, content, id);
-    if (!result.success)
-      return res.status(400).json({ message: result.message });
-    return res.status(200).json(result.post);
+    if (!result.success) {
+      if (result.message === "ForBidden")
+        return res
+          .status(statusCodes.UNAUTHORIZED)
+          .json({ message: result.message });
+      return res
+        .status(statusCodes.NOT_FOUND)
+        .json({ message: result.message });
+    }
+    return res.status(statusCodes.OK).json(result.post);
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error" });
+    return res
+      .status(statusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 };
 
@@ -67,11 +85,20 @@ const deletePost = async (req, res) => {
 
   try {
     const result = await deletePostService(post_id, id);
-    if (!result.success)
-      return res.status(400).json({ message: result.message });
-    return res.status(200).json({ message: result.message });
+    if (!result.success) {
+      if (result.message === "ForBidden")
+        return res
+          .status(statusCodes.UNAUTHORIZED)
+          .json({ message: result.message });
+      return res
+        .status(statusCodes.NOT_FOUND)
+        .json({ message: result.message });
+    }
+    return res.status(statusCodes.OK).json({ message: result.message });
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error" });
+    return res
+      .status(statusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 };
 

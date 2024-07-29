@@ -1,21 +1,25 @@
-import { check, validationResult } from "express-validator";
+import { body, check, param, validationResult } from "express-validator";
 
 // Create Post Validation Rules
 const createPostValidationRules = [
-  check("title").notEmpty().withMessage("Title is required"),
-  check("content").notEmpty().withMessage("Content is required"),
+  body("title").notEmpty().withMessage("Title is required"),
+  body("content").notEmpty().withMessage("Content is required"),
 ];
 
 // Update Post Validation Rules
 const updatePostValidationRules = [
-  check("post_id").isInt().withMessage("Valid PostId is required"),
-  check("title").optional().notEmpty().withMessage("Title cannot be empty"),
-  check("content").optional().notEmpty().withMessage("Content cannot be empty"),
+  param("post_id").isInt().withMessage("Valid PostId is required"),
+  body("title").optional().notEmpty().withMessage("Title cannot be empty"),
+  body("content").optional().notEmpty().withMessage("Content cannot be empty"),
 ];
 
 // Delete Post Validation Rules
 const deletePostValidationRules = [
-  check("post_id").isInt().withMessage("Valid post ID is required"),
+  param("post_id").isInt().withMessage("Valid post ID is required"),
+];
+
+const getPostByIdValidationRules = [
+  param("post_id").isInt().withMessage("Valid post ID is required"),
 ];
 
 // Validate function
@@ -31,5 +35,6 @@ export {
   createPostValidationRules,
   updatePostValidationRules,
   deletePostValidationRules,
+  getPostByIdValidationRules,
   validate,
 };

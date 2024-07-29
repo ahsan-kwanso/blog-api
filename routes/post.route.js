@@ -13,6 +13,7 @@ import {
   updatePostValidationRules,
   deletePostValidationRules,
   validate,
+  getPostByIdValidationRules,
 } from "../validators/post.validator.js";
 
 const router = express.Router();
@@ -25,7 +26,13 @@ router.post(
   createPost
 );
 router.get("/", authenticateJWT, getPosts);
-router.get("/:post_id", authenticateJWT, getPostById);
+router.get(
+  "/:post_id",
+  getPostByIdValidationRules,
+  validate,
+  authenticateJWT,
+  getPostById
+);
 router.put(
   "/:post_id",
   authenticateJWT,

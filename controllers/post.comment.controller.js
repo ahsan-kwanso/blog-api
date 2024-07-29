@@ -3,16 +3,21 @@ import {
   getPostsByUserWithCommentsService,
   searchPostsByTitleOrContentService,
 } from "../services/post.comment.service.js";
+import { statusCodes } from "../utils/statusCodes.js";
 
 // Get posts with nested comments
 const getPostsWithComments = async (req, res) => {
   try {
     const result = await getPostsWithCommentsService(req);
     if (!result.success)
-      return res.status(400).json({ message: result.message });
-    return res.status(200).json(result.data);
+      return res
+        .status(statusCodes.BAD_REQUEST)
+        .json({ message: result.message });
+    return res.status(statusCodes.OK).json(result.data);
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error" });
+    return res
+      .status(statusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 };
 
@@ -20,10 +25,13 @@ const getPostsWithComments = async (req, res) => {
 const getPostsByUserWithComments = async (req, res) => {
   try {
     const result = await getPostsByUserWithCommentsService(req);
-    if (!result.success) res.status(400).json({ message: result.message });
-    return res.status(200).json(result.data);
+    if (!result.success)
+      res.status(statusCodes.UNAUTHORIZED).json({ message: result.message });
+    return res.status(statusCodes.OK).json(result.data);
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error" });
+    return res
+      .status(statusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 };
 
@@ -31,10 +39,13 @@ const getPostsByUserWithComments = async (req, res) => {
 const searchPostsByTitleOrContent = async (req, res) => {
   try {
     const result = await searchPostsByTitleOrContentService(req);
-    if (!result.success) res.status(400).json({ message: result.message });
-    return res.status(200).json(result.data);
+    if (!result.success)
+      res.status(statusCodes.BAD_REQUEST).json({ message: result.message });
+    return res.status(statusCodes.OK).json(result.data);
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error" });
+    return res
+      .status(statusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 };
 

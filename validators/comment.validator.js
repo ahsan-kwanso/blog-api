@@ -33,3 +33,5 @@ export {
   deleteCommentValidationRules,
   validate,
 };
+
+//add separate method for body params and query params

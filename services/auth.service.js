@@ -5,7 +5,7 @@ import { generateToken } from "../utils/jwt.js";
 const signUpUser = async (name, email, password) => {
   const existingUser = await User.findOne({ where: { email } });
   if (existingUser) {
-    throw new Error("User already exists.");
+    return { success: false, message: "User already exists." };
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -16,20 +16,22 @@ const signUpUser = async (name, email, password) => {
   });
 
   const token = generateToken(user);
-  return token;
+  return { success: true, token: token };
 };
 
 const signInUser = async (email, password) => {
   const user = await User.findOne({ where: { email } });
+  if (!user) {
+    return { success: false, message: "Invalid email or password. " };
+  }
   const isPasswordValid =
     user !== null ? await bcrypt.compare(password, user.password) : null;
-
-  if (!user || !isPasswordValid) {
-    throw new Error("Invalid email or password.");
+  if (!isPasswordValid) {
+    return { success: false, message: "Wrong password. " };
   }
 
   const token = generateToken(user);
-  return token;
+  return { success: true, token: token };
 };
 
 export { signInUser, signUpUser };

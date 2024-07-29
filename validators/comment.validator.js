@@ -1,23 +1,32 @@
-import { check, validationResult } from "express-validator";
+import { body, check, param, validationResult } from "express-validator";
 
 // Create Comment Validation Rules
 const createCommentValidationRules = [
-  check("PostId").isInt().withMessage("Valid PostId is required"),
-  check("title").notEmpty().withMessage("Title is required"),
-  check("content").notEmpty().withMessage("Content is required"),
+  body("PostId").isInt().withMessage("Valid PostId is required"),
+  body("title").notEmpty().withMessage("Title is required"),
+  body("content").notEmpty().withMessage("Content is required"),
 ];
 
 // Update Comment Validation Rules
 const updateCommentValidationRules = [
-  check("comment_id").isInt().withMessage("Valid comment Id is required"),
-  check("title").optional().notEmpty().withMessage("Title cannot be empty"),
-  check("content").optional().notEmpty().withMessage("Content cannot be empty"),
+  param("comment_id").isInt().withMessage("Valid comment Id is required"),
+  body("title").optional().notEmpty().withMessage("Title cannot be empty"),
+  body("content").optional().notEmpty().withMessage("Content cannot be empty"),
 ];
 
 // Delete Comment Validation Rules
 const deleteCommentValidationRules = [
-  check("comment_id").isInt().withMessage("Valid comment ID is required"),
+  param("comment_id").isInt().withMessage("Valid comment ID is required"),
 ];
+
+const getCommentByIdValidationRules = [
+  param("comment_id").isInt().withMessage("Valid comment ID is required"),
+];
+
+const getCommentByPostIdValidationRules = [
+  param("post_id").isInt().withMessage("Valid post ID is required"),
+];
+
 // Validate function
 const validate = (req, res, next) => {
   const errors = validationResult(req);
@@ -31,6 +40,8 @@ export {
   createCommentValidationRules,
   updateCommentValidationRules,
   deleteCommentValidationRules,
+  getCommentByIdValidationRules,
+  getCommentByPostIdValidationRules,
   validate,
 };
 

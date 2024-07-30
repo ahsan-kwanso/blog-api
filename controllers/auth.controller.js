@@ -1,16 +1,16 @@
 import { signUpUser, signInUser } from "../services/auth.service.js";
-import { statusCodes } from "../utils/statusCodes.js";
+import { BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, UNAUTHORIZED, OK } from "http-status-codes";
 
 const signUp = async (req, res) => {
   const { name, email, password } = req.body;
   try {
     const result = await signUpUser(name, email, password);
     if (!result.success) {
-      return res.status(statusCodes.BAD_REQUEST).json({ message: result.message });
+      return res.status(BAD_REQUEST).json({ message: result.message });
     }
-    return res.status(statusCodes.CREATED).json({ token: result.token });
+    return res.status(CREATED).json({ token: result.token });
   } catch (error) {
-    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+    return res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
   }
 };
 
@@ -18,11 +18,10 @@ const signIn = async (req, res) => {
   const { email, password } = req.body;
   try {
     const result = await signInUser(email, password);
-    if (!result.success)
-      return res.status(statusCodes.UNAUTHORIZED).json({ message: result.message });
-    return res.status(statusCodes.OK).json({ token: result.token });
+    if (!result.success) return res.status(UNAUTHORIZED).json({ message: result.message });
+    return res.status(OK).json({ token: result.token });
   } catch (error) {
-    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+    return res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
   }
 };
 

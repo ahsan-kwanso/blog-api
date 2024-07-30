@@ -6,7 +6,7 @@ import {
   deleteComment as deleteCommentService,
   searchCommentsByTitleOrContent as searchCommentsByTitleOrContentService,
 } from "../services/comment.service.js";
-import { statusCodes } from "../utils/statusCodes.js";
+import { BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, UNAUTHORIZED, OK, NOT_FOUND } from "http-status-codes";
 
 // Create a new comment
 const createComment = async (req, res) => {
@@ -17,11 +17,11 @@ const createComment = async (req, res) => {
     const result = await createCommentService(title, content, PostId, ParentId, id);
     if (!result.success) {
       if (result.message === "Post not Found") return res.status(statusCodes.NOT_FOUND).json({ message: result.message });
-      return res.status(statusCodes.BAD_REQUEST).json({ message: result.message });
+      return res.status(BAD_REQUEST).json({ message: result.message });
     }
-    return res.status(statusCodes.CREATED).json(result.comment);
+    return res.status(CREATED).json(result.comment);
   } catch (error) {
-    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+    return res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
   }
 };
 
@@ -29,10 +29,10 @@ const createComment = async (req, res) => {
 const getCommentsByPostId = async (req, res) => {
   try {
     const comments = await getCommentsByPostIdService(req);
-    if (!comments.success) return res.status(statusCodes.NOT_FOUND).json({ message: comments.message });
-    return res.status(statusCodes.OK).json(comments.data);
+    if (!comments.success) return res.status(NOT_FOUND).json({ message: comments.message });
+    return res.status(OK).json(comments.data);
   } catch (error) {
-    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error. " });
+    return res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal server error. " });
   }
 };
 
@@ -42,10 +42,10 @@ const getCommentById = async (req, res) => {
 
   try {
     const result = await getCommentByIdService(comment_id);
-    if (!result.success) res.status(statusCodes.NOT_FOUND).json({ message: result.message });
-    return res.status(statusCodes.OK).json(result.comment);
+    if (!result.success) res.status(NOT_FOUND).json({ message: result.message });
+    return res.status(OK).json(result.comment);
   } catch (error) {
-    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+    return res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
   }
 };
 // Update a comment
@@ -57,12 +57,12 @@ const updateComment = async (req, res) => {
   try {
     const result = await updateCommentService(comment_id, title, content, id);
     if (!result.success) {
-      if (result.message === "ForBidden") return res.status(statusCodes.UNAUTHORIZED).json({ message: result.message });
-      return res.status(statusCodes.NOT_FOUND).json({ message: result.message });
+      if (result.message === "ForBidden") return res.status(UNAUTHORIZED).json({ message: result.message });
+      return res.status(NOT_FOUND).json({ message: result.message });
     }
-    return res.status(statusCodes.OK).json(result.comment);
+    return res.status(OK).json(result.comment);
   } catch (error) {
-    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+    return res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
   }
 };
 
@@ -74,12 +74,12 @@ const deleteComment = async (req, res) => {
   try {
     const result = await deleteCommentService(comment_id, id);
     if (!result.success) {
-      if (result.message === "ForBidden") return res.status(statusCodes.UNAUTHORIZED).json({ message: result.message });
-      return res.status(statusCodes.NOT_FOUND).json({ message: result.message });
+      if (result.message === "ForBidden") return res.status(UNAUTHORIZED).json({ message: result.message });
+      return res.status(NOT_FOUND).json({ message: result.message });
     }
-    return res.status(statusCodes.OK).json({ message: result.message });
+    return res.status(OK).json({ message: result.message });
   } catch (error) {
-    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+    return res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
   }
 };
 
@@ -87,10 +87,10 @@ const deleteComment = async (req, res) => {
 const searchCommentsByTitleOrContent = async (req, res) => {
   try {
     const result = await searchCommentsByTitleOrContentService(req);
-    if (!result.success) return res.status(statusCodes.BAD_REQUEST).json({ message: result.message });
-    return res.status(statusCodes.OK).json(result.data);
+    if (!result.success) return res.status(BAD_REQUEST).json({ message: result.message });
+    return res.status(OK).json(result.data);
   } catch (error) {
-    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+    return res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
   }
 };
 

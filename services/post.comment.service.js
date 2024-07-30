@@ -5,7 +5,7 @@ import {
   validatePagination,
   generateNextPageUrl,
 } from "../utils/pagination.js";
-import paginationConfig from "../sequelize/config/pagination.config.js";
+import paginationConfig from "../utils/pagination.config.js";
 // Utility function to get posts with nested comments
 const getPostsWithNestedCommentsService = async (posts) => {
   return await Promise.all(

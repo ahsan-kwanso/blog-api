@@ -6,7 +6,7 @@ import {
   validatePagination,
   generateNextPageUrl,
 } from "../utils/pagination.js";
-import paginationConfig from "../sequelize/config/pagination.config.js";
+import paginationConfig from "../utils/pagination.config.js";
 const Comment = db.Comment;
 // Create a new comment
 const createCommentService = async (

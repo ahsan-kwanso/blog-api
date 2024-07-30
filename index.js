@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 import express from "express";
-import { sequelize } from "./sequelize/config/sequelize.js";
 import router from "./routes/index.js";
 
 dotenv.config();
@@ -14,16 +13,3 @@ app.get("/", (req, res) => {
 });
 
 app.use(router);
-
-const dbSync = async () => {
-  try {
-    await sequelize.sync();
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error("Unable to connect to the database:", error);
-  }
-};
-
-dbSync();

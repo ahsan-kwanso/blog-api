@@ -1,37 +1,55 @@
 import bcrypt from "bcryptjs";
-import db from "../sequelize/models/index.js";
 import User from "../sequelize/models/user.model.js";
 import { generateToken } from "../utils/jwt.js";
 
+// Function to handle user signup
 const signUpUser = async (name, email, password) => {
-  const existingUser = await User.findOne({ where: { email } });
-  if (existingUser) {
-    return { success: false, message: "User already exists." };
+  try {
+    // Check if the user already exists
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return { success: false, message: "User already exists." };
+    }
+
+    // Create a new user with hashed password
+    //const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await User.create({
+      name,
+      email,
+      password,
+    });
+
+    // Generate a token for the user
+    const token = generateToken(user);
+    return { success: true, token };
+  } catch (error) {
+    console.error("Error signing up user:", error);
+    return { success: false, message: "Error signing up user." };
   }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const user = await User.create({
-    name,
-    email,
-    password: hashedPassword,
-  });
-
-  const token = generateToken(user);
-  return { success: true, token: token };
 };
 
+// Function to handle user sign-in
 const signInUser = async (email, password) => {
-  const user = await User.findOne({ where: { email } });
-  if (!user) {
-    return { success: false, message: "Invalid email or password. " };
-  }
-  const isPasswordValid = user !== null ? await bcrypt.compare(password, user.password) : null;
-  if (!isPasswordValid) {
-    return { success: false, message: "Wrong password. " };
-  }
+  try {
+    // Fetch the user with the password field included
+    const user = await User.scope("withPassword").findOne({ where: { email } });
+    if (!user) {
+      return { success: false, message: "Invalid email or password." };
+    }
 
-  const token = generateToken(user);
-  return { success: true, token: token };
+    // Compare provided password with stored hashed password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return { success: false, message: "Wrong password." };
+    }
+
+    // Generate a token for the user
+    const token = generateToken(user);
+    return { success: true, token };
+  } catch (error) {
+    console.error("Error signing in user:", error);
+    return { success: false, message: "Error signing in user." };
+  }
 };
 
 export { signInUser, signUpUser };

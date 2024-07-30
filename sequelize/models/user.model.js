@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/sequelize.js";
+import bcrypt from "bcrypt";
 
 const User = sequelize.define(
   "Users",
@@ -28,6 +29,22 @@ const User = sequelize.define(
   },
   {
     timestamps: true,
+    defaultScope: {
+      attributes: { exclude: ["password"] }, // Exclude password from default queries
+    },
+    scopes: {
+      withPassword: {
+        attributes: { include: ["password"] }, // Include password in this scope if needed
+      },
+    },
+    hooks: {
+      beforeSave: async (user) => {
+        if (user.changed("password")) {
+          const salt = await bcrypt.genSalt(10);
+          user.password = await bcrypt.hash(user.password, salt);
+        }
+      },
+    },
   }
 );
 

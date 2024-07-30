@@ -16,3 +16,8 @@ app.use(router);
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+//use hooks for the case of password, bcrypt in models, make this in hook
+//create scope in users model, for one case scope is not needed while needed for other
+//use package of http status
+//make settings.js file, import all environmental variable there.

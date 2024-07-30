@@ -25,8 +25,7 @@ const signInUser = async (email, password) => {
   if (!user) {
     return { success: false, message: "Invalid email or password. " };
   }
-  const isPasswordValid =
-    user !== null ? await bcrypt.compare(password, user.password) : null;
+  const isPasswordValid = user !== null ? await bcrypt.compare(password, user.password) : null;
   if (!isPasswordValid) {
     return { success: false, message: "Wrong password. " };
   }

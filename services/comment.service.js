@@ -1,21 +1,10 @@
-//import Comment from "../sequelize/models/comment.model.js";
+import Comment from "../sequelize/models/comment.model.js";
 import Post from "../sequelize/models/post.model.js";
-import db from "../sequelize/models/index.js";
 import { Sequelize } from "sequelize";
-import {
-  validatePagination,
-  generateNextPageUrl,
-} from "../utils/pagination.js";
+import { validatePagination, generateNextPageUrl } from "../utils/pagination.js";
 import paginationConfig from "../utils/pagination.config.js";
-const Comment = db.Comment;
 // Create a new comment
-const createCommentService = async (
-  title,
-  content,
-  PostId,
-  ParentId,
-  UserId
-) => {
+const createCommentService = async (title, content, PostId, ParentId, UserId) => {
   const post = await Post.findByPk(PostId);
   if (!post) {
     return { success: false, message: "Post not Found" };
@@ -71,10 +60,7 @@ const buildCommentTree = (comments) => {
 // Get comments by post ID with optional pagination
 const getCommentsByPostIdService = async (req) => {
   const { post_id } = req.params;
-  const {
-    page = paginationConfig.defaultPage,
-    limit = paginationConfig.defaultLimit,
-  } = req.query;
+  const { page = paginationConfig.defaultPage, limit = paginationConfig.defaultLimit } = req.query;
   const pagination = validatePagination(page, limit);
   if (pagination.error) {
     return { success: false, message: pagination.error };
@@ -92,8 +78,7 @@ const getCommentsByPostIdService = async (req) => {
   });
   const commentsWithSubComments = buildCommentTree(comments.rows);
   const totalPages = Math.ceil(comments.count / pagination.pageSize);
-  const nextPage =
-    pagination.pageNumber < totalPages ? pagination.pageNumber + 1 : null;
+  const nextPage = pagination.pageNumber < totalPages ? pagination.pageNumber + 1 : null;
 
   const data = {
     total: comments.count,
@@ -149,12 +134,7 @@ const deleteCommentService = async (comment_id, UserId) => {
 
 // Search comments by title or content
 const searchCommentsByTitleOrContentService = async (req) => {
-  const {
-    title = "",
-    content = "",
-    page = paginationConfig.defaultPage,
-    limit = paginationConfig.defaultLimit,
-  } = req.query;
+  const { title = "", content = "", page = paginationConfig.defaultPage, limit = paginationConfig.defaultLimit } = req.query;
 
   const pagination = validatePagination(page, limit);
   if (pagination.error) {
@@ -180,8 +160,7 @@ const searchCommentsByTitleOrContentService = async (req) => {
   });
 
   const totalPages = Math.ceil(comments.count / pagination.pageSize);
-  const nextPage =
-    pagination.pageNumber < totalPages ? pagination.pageNumber + 1 : null;
+  const nextPage = pagination.pageNumber < totalPages ? pagination.pageNumber + 1 : null;
 
   const data = {
     total: comments.count,

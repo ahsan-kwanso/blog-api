@@ -6,15 +6,11 @@ const signUp = async (req, res) => {
   try {
     const result = await signUpUser(name, email, password);
     if (!result.success) {
-      return res
-        .status(statusCodes.BAD_REQUEST)
-        .json({ message: result.message });
+      return res.status(statusCodes.BAD_REQUEST).json({ message: result.message });
     }
     return res.status(statusCodes.CREATED).json({ token: result.token });
   } catch (error) {
-    return res
-      .status(statusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
   }
 };
 
@@ -23,14 +19,10 @@ const signIn = async (req, res) => {
   try {
     const result = await signInUser(email, password);
     if (!result.success)
-      return res
-        .status(statusCodes.UNAUTHORIZED)
-        .json({ message: result.message });
+      return res.status(statusCodes.UNAUTHORIZED).json({ message: result.message });
     return res.status(statusCodes.OK).json({ token: result.token });
   } catch (error) {
-    return res
-      .status(statusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
   }
 };
 

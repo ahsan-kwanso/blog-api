@@ -1,10 +1,7 @@
 import { Sequelize } from "sequelize";
 import Post from "../sequelize/models/post.model.js";
 import { getCommentsByPostIdDataService } from "./comment.service.js";
-import {
-  validatePagination,
-  generateNextPageUrl,
-} from "../utils/pagination.js";
+import { validatePagination, generateNextPageUrl } from "../utils/pagination.js";
 import paginationConfig from "../utils/pagination.config.js";
 // Utility function to get posts with nested comments
 const getPostsWithNestedCommentsService = async (posts) => {
@@ -21,13 +18,7 @@ const getPostsWithNestedCommentsService = async (posts) => {
 };
 
 // Utility function to format pagination response
-const formatPaginationResponse = (
-  data,
-  totalItems,
-  pageNumber,
-  pageSize,
-  req
-) => {
+const formatPaginationResponse = (data, totalItems, pageNumber, pageSize, req) => {
   const totalPages = Math.ceil(totalItems / pageSize);
   const nextPage = pageNumber < totalPages ? pageNumber + 1 : null;
   const nextPageUrl = generateNextPageUrl(nextPage, pageSize, req);
@@ -42,10 +33,7 @@ const formatPaginationResponse = (
 
 // Get posts with nested comments
 const getPostsWithCommentsService = async (req) => {
-  const {
-    page = paginationConfig.defaultPage,
-    limit = paginationConfig.defaultLimit,
-  } = req.query;
+  const { page = paginationConfig.defaultPage, limit = paginationConfig.defaultLimit } = req.query;
 
   const pagination = validatePagination(page, limit);
   if (pagination.error) {
@@ -60,23 +48,14 @@ const getPostsWithCommentsService = async (req) => {
   const postsWithComments = await getPostsWithNestedCommentsService(posts);
   const totalPosts = await Post.count();
 
-  const data = formatPaginationResponse(
-    postsWithComments,
-    totalPosts,
-    pagination.pageNumber,
-    pagination.pageSize,
-    req
-  );
+  const data = formatPaginationResponse(postsWithComments, totalPosts, pagination.pageNumber, pagination.pageSize, req);
   return { success: true, data: data };
 };
 
 // Get posts by user with nested comments
 const getPostsByUserWithCommentsService = async (req) => {
   const { user_id } = req.params;
-  const {
-    page = paginationConfig.defaultPage,
-    limit = paginationConfig.defaultLimit,
-  } = req.query;
+  const { page = paginationConfig.defaultPage, limit = paginationConfig.defaultLimit } = req.query;
   const { id } = req.user;
   if (parseInt(user_id) !== id) {
     return { success: false, message: "ForBidden" };
@@ -96,24 +75,13 @@ const getPostsByUserWithCommentsService = async (req) => {
   const postsWithComments = await getPostsWithNestedCommentsService(posts);
   const totalPosts = await Post.count({ where: { UserId: user_id } });
 
-  const data = formatPaginationResponse(
-    postsWithComments,
-    totalPosts,
-    pagination.pageNumber,
-    pagination.pageSize,
-    req
-  );
+  const data = formatPaginationResponse(postsWithComments, totalPosts, pagination.pageNumber, pagination.pageSize, req);
   return { success: true, data: data };
 };
 
 // Search posts by title or content
 const searchPostsByTitleOrContentService = async (req) => {
-  const {
-    title = "",
-    content = "",
-    page = paginationConfig.defaultPage,
-    limit = paginationConfig.defaultLimit,
-  } = req.query;
+  const { title = "", content = "", page = paginationConfig.defaultPage, limit = paginationConfig.defaultLimit } = req.query;
   if (!title && !content) {
     return {
       success: false,
@@ -138,18 +106,8 @@ const searchPostsByTitleOrContentService = async (req) => {
   });
 
   const postsWithComments = await getPostsWithNestedCommentsService(posts.rows);
-  const data = formatPaginationResponse(
-    postsWithComments,
-    posts.count,
-    pagination.pageNumber,
-    pagination.pageSize,
-    req
-  );
+  const data = formatPaginationResponse(postsWithComments, posts.count, pagination.pageNumber, pagination.pageSize, req);
   return { success: true, data: data };
 };
 
-export {
-  getPostsWithCommentsService,
-  getPostsByUserWithCommentsService,
-  searchPostsByTitleOrContentService,
-};
+export { getPostsWithCommentsService, getPostsByUserWithCommentsService, searchPostsByTitleOrContentService };

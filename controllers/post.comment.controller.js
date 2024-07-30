@@ -10,14 +10,10 @@ const getPostsWithComments = async (req, res) => {
   try {
     const result = await getPostsWithCommentsService(req);
     if (!result.success)
-      return res
-        .status(statusCodes.BAD_REQUEST)
-        .json({ message: result.message });
+      return res.status(statusCodes.BAD_REQUEST).json({ message: result.message });
     return res.status(statusCodes.OK).json(result.data);
   } catch (error) {
-    return res
-      .status(statusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
   }
 };
 
@@ -25,13 +21,10 @@ const getPostsWithComments = async (req, res) => {
 const getPostsByUserWithComments = async (req, res) => {
   try {
     const result = await getPostsByUserWithCommentsService(req);
-    if (!result.success)
-      res.status(statusCodes.UNAUTHORIZED).json({ message: result.message });
+    if (!result.success) res.status(statusCodes.UNAUTHORIZED).json({ message: result.message });
     return res.status(statusCodes.OK).json(result.data);
   } catch (error) {
-    return res
-      .status(statusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
   }
 };
 
@@ -39,18 +32,11 @@ const getPostsByUserWithComments = async (req, res) => {
 const searchPostsByTitleOrContent = async (req, res) => {
   try {
     const result = await searchPostsByTitleOrContentService(req);
-    if (!result.success)
-      res.status(statusCodes.BAD_REQUEST).json({ message: result.message });
+    if (!result.success) res.status(statusCodes.BAD_REQUEST).json({ message: result.message });
     return res.status(statusCodes.OK).json(result.data);
   } catch (error) {
-    return res
-      .status(statusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
   }
 };
 
-export {
-  getPostsWithComments,
-  getPostsByUserWithComments,
-  searchPostsByTitleOrContent,
-};
+export { getPostsWithComments, getPostsByUserWithComments, searchPostsByTitleOrContent };

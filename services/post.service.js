@@ -1,9 +1,5 @@
-//import { Post } from "../sequelize/models/index.js";
 import Post from "../sequelize/models/post.model.js";
-import {
-  validatePagination,
-  generateNextPageUrl,
-} from "../utils/pagination.js";
+import { validatePagination, generateNextPageUrl } from "../utils/pagination.js";
 import paginationConfig from "../utils/pagination.config.js";
 
 const createPostService = async (title, content, userId) => {
@@ -12,10 +8,7 @@ const createPostService = async (title, content, userId) => {
 };
 
 const getPostsService = async (req) => {
-  const {
-    page = paginationConfig.defaultPage,
-    limit = paginationConfig.defaultLimit,
-  } = req.query;
+  const { page = paginationConfig.defaultPage, limit = paginationConfig.defaultLimit } = req.query;
 
   // Validate pagination parameters
   const pagination = validatePagination(page, limit);
@@ -31,8 +24,7 @@ const getPostsService = async (req) => {
 
   // Calculate pagination details
   const totalPages = Math.ceil(count / pagination.pageSize);
-  const nextPage =
-    pagination.pageNumber < totalPages ? pagination.pageNumber + 1 : null;
+  const nextPage = pagination.pageNumber < totalPages ? pagination.pageNumber + 1 : null;
 
   return {
     posts: rows,
@@ -80,10 +72,4 @@ const deletePostService = async (postId, userId) => {
   return { success: true, message: "Post deleted successfully" };
 };
 
-export {
-  createPostService,
-  getPostsService,
-  getPostByIdService,
-  updatePostService,
-  deletePostService,
-};
+export { createPostService, getPostsService, getPostByIdService, updatePostService, deletePostService };

@@ -1,9 +1,9 @@
 import {
-  createPostService,
-  getPostsService,
-  getPostByIdService,
-  updatePostService,
-  deletePostService,
+  createPost as createPostService,
+  getPosts as getPostsService,
+  getPostById as getPostByIdService,
+  updatePost as updatePostService,
+  deletePost as deletePostService,
 } from "../services/post.service.js";
 import { statusCodes } from "../utils/statusCodes.js";
 
@@ -54,8 +54,7 @@ const updatePost = async (req, res) => {
   try {
     const result = await updatePostService(post_id, title, content, id);
     if (!result.success) {
-      if (result.message === "ForBidden")
-        return res.status(statusCodes.UNAUTHORIZED).json({ message: result.message });
+      if (result.message === "ForBidden") return res.status(statusCodes.UNAUTHORIZED).json({ message: result.message });
       return res.status(statusCodes.NOT_FOUND).json({ message: result.message });
     }
     return res.status(statusCodes.OK).json(result.post);
@@ -71,8 +70,7 @@ const deletePost = async (req, res) => {
   try {
     const result = await deletePostService(post_id, id);
     if (!result.success) {
-      if (result.message === "ForBidden")
-        return res.status(statusCodes.UNAUTHORIZED).json({ message: result.message });
+      if (result.message === "ForBidden") return res.status(statusCodes.UNAUTHORIZED).json({ message: result.message });
       return res.status(statusCodes.NOT_FOUND).json({ message: result.message });
     }
     return res.status(statusCodes.OK).json({ message: result.message });

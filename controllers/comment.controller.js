@@ -1,10 +1,10 @@
 import {
-  createCommentService,
-  getCommentsByPostIdService,
-  getCommentByIdService,
-  updateCommentService,
-  deleteCommentService,
-  searchCommentsByTitleOrContentService,
+  createComment as createCommentService,
+  getCommentsByPostId as getCommentsByPostIdService,
+  getCommentById as getCommentByIdService,
+  updateComment as updateCommentService,
+  deleteComment as deleteCommentService,
+  searchCommentsByTitleOrContent as searchCommentsByTitleOrContentService,
 } from "../services/comment.service.js";
 import { statusCodes } from "../utils/statusCodes.js";
 
@@ -16,8 +16,7 @@ const createComment = async (req, res) => {
   try {
     const result = await createCommentService(title, content, PostId, ParentId, id);
     if (!result.success) {
-      if (result.message === "Post not Found")
-        return res.status(statusCodes.NOT_FOUND).json({ message: result.message });
+      if (result.message === "Post not Found") return res.status(statusCodes.NOT_FOUND).json({ message: result.message });
       return res.status(statusCodes.BAD_REQUEST).json({ message: result.message });
     }
     return res.status(statusCodes.CREATED).json(result.comment);
@@ -30,13 +29,10 @@ const createComment = async (req, res) => {
 const getCommentsByPostId = async (req, res) => {
   try {
     const comments = await getCommentsByPostIdService(req);
-    if (!comments.success)
-      return res.status(statusCodes.NOT_FOUND).json({ message: comments.message });
+    if (!comments.success) return res.status(statusCodes.NOT_FOUND).json({ message: comments.message });
     return res.status(statusCodes.OK).json(comments.data);
   } catch (error) {
-    return res
-      .status(statusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error. " });
+    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error. " });
   }
 };
 
@@ -61,8 +57,7 @@ const updateComment = async (req, res) => {
   try {
     const result = await updateCommentService(comment_id, title, content, id);
     if (!result.success) {
-      if (result.message === "ForBidden")
-        return res.status(statusCodes.UNAUTHORIZED).json({ message: result.message });
+      if (result.message === "ForBidden") return res.status(statusCodes.UNAUTHORIZED).json({ message: result.message });
       return res.status(statusCodes.NOT_FOUND).json({ message: result.message });
     }
     return res.status(statusCodes.OK).json(result.comment);
@@ -79,8 +74,7 @@ const deleteComment = async (req, res) => {
   try {
     const result = await deleteCommentService(comment_id, id);
     if (!result.success) {
-      if (result.message === "ForBidden")
-        return res.status(statusCodes.UNAUTHORIZED).json({ message: result.message });
+      if (result.message === "ForBidden") return res.status(statusCodes.UNAUTHORIZED).json({ message: result.message });
       return res.status(statusCodes.NOT_FOUND).json({ message: result.message });
     }
     return res.status(statusCodes.OK).json({ message: result.message });
@@ -93,19 +87,11 @@ const deleteComment = async (req, res) => {
 const searchCommentsByTitleOrContent = async (req, res) => {
   try {
     const result = await searchCommentsByTitleOrContentService(req);
-    if (!result.success)
-      return res.status(statusCodes.BAD_REQUEST).json({ message: result.message });
+    if (!result.success) return res.status(statusCodes.BAD_REQUEST).json({ message: result.message });
     return res.status(statusCodes.OK).json(result.data);
   } catch (error) {
     return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
   }
 };
 
-export {
-  createComment,
-  getCommentsByPostId,
-  getCommentById,
-  updateComment,
-  deleteComment,
-  searchCommentsByTitleOrContent,
-};
+export { createComment, getCommentsByPostId, getCommentById, updateComment, deleteComment, searchCommentsByTitleOrContent };

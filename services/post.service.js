@@ -2,12 +2,12 @@ import Post from "../sequelize/models/post.model.js";
 import { validatePagination, generateNextPageUrl } from "../utils/pagination.js";
 import paginationConfig from "../utils/pagination.config.js";
 
-const createPostService = async (title, content, userId) => {
+const createPost = async (title, content, userId) => {
   const post = await Post.create({ title, content, UserId: userId });
   return post;
 };
 
-const getPostsService = async (req) => {
+const getPosts = async (req) => {
   const { page = paginationConfig.defaultPage, limit = paginationConfig.defaultLimit } = req.query;
 
   // Validate pagination parameters
@@ -35,7 +35,7 @@ const getPostsService = async (req) => {
   };
 };
 
-const getPostByIdService = async (postId) => {
+const getPostById = async (postId) => {
   const post = await Post.findByPk(postId);
   if (!post) {
     return { success: false, message: "Post not Found" };
@@ -43,7 +43,7 @@ const getPostByIdService = async (postId) => {
   return { success: true, post: post };
 };
 
-const updatePostService = async (postId, title, content, userId) => {
+const updatePost = async (postId, title, content, userId) => {
   const post = await Post.findByPk(postId);
   if (!post) {
     return { success: false, message: "Post not Found" };
@@ -59,7 +59,7 @@ const updatePostService = async (postId, title, content, userId) => {
   return { success: true, post: post };
 };
 
-const deletePostService = async (postId, userId) => {
+const deletePost = async (postId, userId) => {
   const post = await Post.findByPk(postId);
   if (!post) {
     return { success: false, message: "Post not Found" };
@@ -72,4 +72,4 @@ const deletePostService = async (postId, userId) => {
   return { success: true, message: "Post deleted successfully" };
 };
 
-export { createPostService, getPostsService, getPostByIdService, updatePostService, deletePostService };
+export { createPost, getPosts, getPostById, updatePost, deletePost };

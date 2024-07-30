@@ -4,7 +4,7 @@ import { Sequelize } from "sequelize";
 import { validatePagination, generateNextPageUrl } from "../utils/pagination.js";
 import paginationConfig from "../utils/pagination.config.js";
 // Create a new comment
-const createCommentService = async (title, content, PostId, ParentId, UserId) => {
+const createComment = async (title, content, PostId, ParentId, UserId) => {
   const post = await Post.findByPk(PostId);
   if (!post) {
     return { success: false, message: "Post not Found" };
@@ -58,7 +58,7 @@ const buildCommentTree = (comments) => {
 };
 
 // Get comments by post ID with optional pagination
-const getCommentsByPostIdService = async (req) => {
+const getCommentsByPostId = async (req) => {
   const { post_id } = req.params;
   const { page = paginationConfig.defaultPage, limit = paginationConfig.defaultLimit } = req.query;
   const pagination = validatePagination(page, limit);
@@ -91,7 +91,7 @@ const getCommentsByPostIdService = async (req) => {
 };
 
 // Get a single comment by ID
-const getCommentByIdService = async (comment_id) => {
+const getCommentById = async (comment_id) => {
   const comment = await Comment.findByPk(comment_id);
   if (!comment) {
     return { success: false, message: "Comment not Found" };
@@ -100,7 +100,7 @@ const getCommentByIdService = async (comment_id) => {
 };
 
 // Update a comment
-const updateCommentService = async (comment_id, title, content, UserId) => {
+const updateComment = async (comment_id, title, content, UserId) => {
   const comment = await Comment.findByPk(comment_id);
   if (!comment) {
     return { success: false, message: "Comment not Found" };
@@ -118,7 +118,7 @@ const updateCommentService = async (comment_id, title, content, UserId) => {
 };
 
 // Delete a comment
-const deleteCommentService = async (comment_id, UserId) => {
+const deleteComment = async (comment_id, UserId) => {
   const comment = await Comment.findByPk(comment_id);
   if (!comment) {
     return { success: false, message: "Comment not Found" };
@@ -133,7 +133,7 @@ const deleteCommentService = async (comment_id, UserId) => {
 };
 
 // Search comments by title or content
-const searchCommentsByTitleOrContentService = async (req) => {
+const searchCommentsByTitleOrContent = async (req) => {
   const { title = "", content = "", page = paginationConfig.defaultPage, limit = paginationConfig.defaultLimit } = req.query;
 
   const pagination = validatePagination(page, limit);
@@ -172,7 +172,7 @@ const searchCommentsByTitleOrContentService = async (req) => {
   return { success: true, data: data };
 };
 
-const getCommentsByPostIdDataService = async (PostId) => {
+const getCommentsByPostIdData = async (PostId) => {
   try {
     const comments = await Comment.findAll({ where: { PostId } });
     const rootComments = buildCommentTree(comments);
@@ -183,11 +183,11 @@ const getCommentsByPostIdDataService = async (PostId) => {
 };
 
 export {
-  createCommentService,
-  getCommentsByPostIdService,
-  getCommentByIdService,
-  updateCommentService,
-  deleteCommentService,
-  searchCommentsByTitleOrContentService,
-  getCommentsByPostIdDataService,
+  createComment,
+  getCommentsByPostId,
+  getCommentById,
+  updateComment,
+  deleteComment,
+  searchCommentsByTitleOrContent,
+  getCommentsByPostIdData,
 };

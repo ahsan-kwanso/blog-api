@@ -13,21 +13,21 @@ import {
   createCommentValidationRules,
   updateCommentValidationRules,
   deleteCommentValidationRules,
-  validate,
   getCommentByIdValidationRules,
   getCommentByPostIdValidationRules,
   searchByTitleOrContentValidator,
 } from "../validators/comment.validator.js";
+import { validate } from "../validators/validate.js";
 
 const router = express.Router();
 
-router.post("/", authenticateJWT, createCommentValidationRules, validate, createComment);
-router.get("/post/:post_id", authenticateJWT, getCommentByPostIdValidationRules, validate, getCommentsByPostId);
-router.get("/:comment_id", authenticateJWT, getCommentByIdValidationRules, validate, getCommentById);
-router.put("/:comment_id", authenticateJWT, updateCommentValidationRules, validate, updateComment);
+router.post("/", authenticateJWT, validate(createCommentValidationRules), createComment);
+router.get("/post/:post_id", authenticateJWT, validate(getCommentByPostIdValidationRules), getCommentsByPostId);
+router.get("/:comment_id", authenticateJWT, validate(getCommentByIdValidationRules), getCommentById);
+router.put("/:comment_id", authenticateJWT, validate(updateCommentValidationRules), updateComment);
 
-router.delete("/:comment_id", authenticateJWT, deleteCommentValidationRules, validate, deleteComment);
+router.delete("/:comment_id", authenticateJWT, validate(deleteCommentValidationRules), deleteComment);
 
-router.get("/", authenticateJWT, searchByTitleOrContentValidator, validate, searchCommentsByTitleOrContent);
+router.get("/", authenticateJWT, validate(searchByTitleOrContentValidator), searchCommentsByTitleOrContent);
 
 export default router;

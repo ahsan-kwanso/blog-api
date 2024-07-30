@@ -14,33 +14,15 @@ const updatePostValidationRules = [
 ];
 
 // Delete Post Validation Rules
-const deletePostValidationRules = [
-  param("post_id").isInt().withMessage("Valid post ID is required"),
-];
+const deletePostValidationRules = [param("post_id").isInt().withMessage("Valid post ID is required")];
 
-const getPostByIdValidationRules = [
-  param("post_id").isInt().withMessage("Valid post ID is required"),
-];
+const getPostByIdValidationRules = [param("post_id").isInt().withMessage("Valid post ID is required")];
 
-const getPostsByUserWithCommentsValidator = [
-  param("user_id").isInt().withMessage("Valid user ID is required"),
-];
-
-// Validate function
-const validate = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(statusCodes.BAD_REQUEST).json({ errors: errors.array() });
-  }
-  next();
-};
+const getPostsByUserWithCommentsValidator = [param("user_id").isInt().withMessage("Valid user ID is required")];
 
 const searchByTitleOrContentValidator = [
   query("title").optional().isString().withMessage("Title must be a string"),
-  query("content")
-    .optional()
-    .isString()
-    .withMessage("Content must be a string"),
+  query("content").optional().isString().withMessage("Content must be a string"),
 ];
 
 export {
@@ -50,5 +32,4 @@ export {
   getPostByIdValidationRules,
   searchByTitleOrContentValidator,
   getPostsByUserWithCommentsValidator,
-  validate,
 };

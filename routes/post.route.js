@@ -6,16 +6,17 @@ import {
   createPostValidationRules,
   updatePostValidationRules,
   deletePostValidationRules,
-  validate,
   getPostByIdValidationRules,
 } from "../validators/post.validator.js";
 
+import { validate } from "../validators/validate.js";
+
 const router = express.Router();
 
-router.post("/", authenticateJWT, createPostValidationRules, validate, createPost);
+router.post("/", authenticateJWT, validate(createPostValidationRules), createPost);
 router.get("/", authenticateJWT, getPosts);
-router.get("/:post_id", getPostByIdValidationRules, validate, authenticateJWT, getPostById);
-router.put("/:post_id", authenticateJWT, updatePostValidationRules, validate, updatePost);
-router.delete("/:post_id", authenticateJWT, deletePostValidationRules, validate, deletePost);
+router.get("/:post_id", validate(getPostByIdValidationRules), authenticateJWT, getPostById);
+router.put("/:post_id", authenticateJWT, validate(updatePostValidationRules), updatePost);
+router.delete("/:post_id", authenticateJWT, validate(deletePostValidationRules), deletePost);
 
 export default router;

@@ -13,16 +13,4 @@ const signInValidationRules = [
   body("password").notEmpty().withMessage("Password is required"),
 ];
 
-const validate = (validationRules) => {
-  return async (req, res, next) => {
-    await Promise.all(validationRules.map((rule) => rule.run(req)));
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(statusCodes.BAD_REQUEST).json({ errors: errors.array() });
-    }
-    next();
-  };
-};
-
-export { signInValidationRules, signUpValidationRules, validate };
+export { signInValidationRules, signUpValidationRules };

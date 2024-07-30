@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js",
-    "db:migrate": "npx sequelize-cli db:migrate --config config/db.config.js"
+    "db:migrate": "npx sequelize-cli db:migrate --config sequelize/config/db.config.js"
   },
   "keywords": [],
   "author": "",

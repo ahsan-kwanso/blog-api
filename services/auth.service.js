@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-//import { User } from "../sequelize/models/index.js";
+import db from "../sequelize/models/index.js";
 import User from "../sequelize/models/user.model.js";
 import { generateToken } from "../utils/jwt.js";
 

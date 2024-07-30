@@ -25,5 +25,4 @@ if (env === "production") {
     dialect: config.dialect,
   });
 }
-
 export { sequelize };

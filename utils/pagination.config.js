@@ -1,6 +1,6 @@
 const paginationConfig = {
   defaultPage: 1,
-  defaultLimit: 2,
+  defaultLimit: 6,
 };
 
 export default paginationConfig;

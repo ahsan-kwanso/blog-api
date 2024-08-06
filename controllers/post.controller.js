@@ -5,7 +5,7 @@ import {
   updatePost as updatePostService,
   deletePost as deletePostService,
 } from "../services/post.service.js";
-import { CREATED, INTERNAL_SERVER_ERROR, UNAUTHORIZED, OK, NOT_FOUND } from "http-status-codes";
+import { CREATED, INTERNAL_SERVER_ERROR, UNAUTHORIZED, OK, NOT_FOUND, FORBIDDEN } from "http-status-codes";
 
 const createPost = async (req, res) => {
   const { title, content } = req.body;
@@ -50,11 +50,10 @@ const updatePost = async (req, res) => {
   const { post_id } = req.params;
   const { title, content } = req.body;
   const { id } = req.user;
-
   try {
     const result = await updatePostService(post_id, title, content, id);
     if (!result.success) {
-      if (result.message === "ForBidden") return res.status(UNAUTHORIZED).json({ message: result.message });
+      if (result.message === "ForBidden") return res.status(FORBIDDEN).json({ message: result.message });
       return res.status(NOT_FOUND).json({ message: result.message });
     }
     return res.status(OK).json(result.post);
@@ -70,7 +69,7 @@ const deletePost = async (req, res) => {
   try {
     const result = await deletePostService(post_id, id);
     if (!result.success) {
-      if (result.message === "ForBidden") return res.status(UNAUTHORIZED).json({ message: result.message });
+      if (result.message === "ForBidden") return res.status(FORBIDDEN).json({ message: result.message });
       return res.status(NOT_FOUND).json({ message: result.message });
     }
     return res.status(OK).json({ message: result.message });

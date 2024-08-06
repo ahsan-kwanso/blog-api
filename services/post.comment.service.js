@@ -110,4 +110,18 @@ const searchPostsByTitleOrContent = async (req) => {
   return { success: true, data: data };
 };
 
-export { getPostsWithComments, getPostsByUserWithComments, searchPostsByTitleOrContent };
+const getPostWithCommentsById = async (postId) => {
+  try {
+    // Fetch the post by ID
+    const posts = await Post.findAll();
+
+    const postsWithComments = await getPostsWithNestedComments(posts);
+    const postWithComments = postsWithComments.filter((post) => post.id == postId);
+    return { success: true, data: postWithComments };
+  } catch (error) {
+    console.error("Error fetching post with comments:", error);
+    return { success: false, message: "Internal server error" };
+  }
+};
+
+export { getPostsWithComments, getPostsByUserWithComments, searchPostsByTitleOrContent, getPostWithCommentsById };

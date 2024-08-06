@@ -2,6 +2,7 @@ import {
   getPostsWithComments as getPostsWithCommentsService,
   getPostsByUserWithComments as getPostsByUserWithCommentsService,
   searchPostsByTitleOrContent as searchPostsByTitleOrContentService,
+  getPostWithCommentsById as getPostWithCommentsByIdService,
 } from "../services/post.comment.service.js";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR, UNAUTHORIZED, OK } from "http-status-codes";
 
@@ -38,4 +39,18 @@ const searchPostsByTitleOrContent = async (req, res) => {
   }
 };
 
-export { getPostsWithComments, getPostsByUserWithComments, searchPostsByTitleOrContent };
+const getPostWithCommentsById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await getPostWithCommentsByIdService(id);
+    if (!result.success) {
+      return res.status(BAD_REQUEST).json({ message: result.message });
+    }
+    return res.status(OK).json(result.data);
+  } catch (error) {
+    return res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+  }
+};
+
+export { getPostsWithComments, getPostsByUserWithComments, searchPostsByTitleOrContent, getPostWithCommentsById };

@@ -40,7 +40,7 @@ const signInUser = async (email, password) => {
     // Compare provided password with stored hashed password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return { success: false, message: "Wrong password." };
+      return { success: false, message: "Invalid email or password." };
     }
 
     // Generate a token for the user

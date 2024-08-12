@@ -1,6 +1,7 @@
 import {
   createPost as createPostService,
   getPosts as getPostsService,
+  getMyPosts as getMyPostsService,
   getPostById as getPostByIdService,
   updatePost as updatePostService,
   deletePost as deletePostService,
@@ -22,6 +23,21 @@ const createPost = async (req, res) => {
 const getPosts = async (req, res) => {
   try {
     const data = await getPostsService(req);
+    res.status(OK).json({
+      total: data.total,
+      page: data.page,
+      pageSize: data.pageSize,
+      nextPage: data.nextPage,
+      posts: data.posts,
+    });
+  } catch (error) {
+    return res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+  }
+};
+
+const getMyPosts = async (req, res) => {
+  try {
+    const data = await getMyPostsService(req);
     res.status(OK).json({
       total: data.total,
       page: data.page,
@@ -78,4 +94,4 @@ const deletePost = async (req, res) => {
   }
 };
 
-export { createPost, getPosts, getPostById, updatePost, deletePost };
+export { createPost, getPosts, getPostById, updatePost, deletePost, getMyPosts };

@@ -1,6 +1,6 @@
 import express from "express";
 import { authenticateJWT } from "../middlewares/authmiddleware.js";
-import { createPost, getPosts, getPostById, updatePost, deletePost } from "../controllers/post.controller.js";
+import { createPost, getPosts, getPostById, updatePost, deletePost, getMyPosts } from "../controllers/post.controller.js";
 
 import {
   createPostValidationRules,
@@ -15,6 +15,7 @@ const router = express.Router();
 
 router.post("/", authenticateJWT, validate(createPostValidationRules), createPost);
 router.get("/", authenticateJWT, getPosts);
+router.get("/me", authenticateJWT, getMyPosts);
 router.get("/:post_id", validate(getPostByIdValidationRules), authenticateJWT, getPostById);
 router.put("/:post_id", authenticateJWT, validate(updatePostValidationRules), updatePost);
 router.delete("/:post_id", authenticateJWT, validate(deletePostValidationRules), deletePost);

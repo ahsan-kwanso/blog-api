@@ -50,6 +50,50 @@ const getPosts = async (req) => {
   };
 };
 
+const getMyPosts = async (req) => {
+  const { page = paginationConfig.defaultPage, limit = paginationConfig.defaultLimit } = req.query;
+  const userId = req.user.id;
+  // Validate pagination parameters
+  const pagination = validatePagination(page, limit);
+  if (pagination.error) {
+    return { success: false, message: pagination.error };
+  }
+
+  // Fetch posts with pagination
+  const { count, rows } = await db.Post.findAndCountAll({
+    where: {
+      UserId: userId, // Filter posts by the current user's ID
+    },
+    limit: pagination.pageSize,
+    offset: (pagination.pageNumber - 1) * pagination.pageSize,
+    include: [
+      {
+        model: User,
+        attributes: ["name"], // Fetch only the name attribute from the User model
+      },
+    ],
+  });
+  const posts = rows.map((post) => ({
+    id: post.id,
+    author: post.User.name, // Access the user's name
+    title: post.title,
+    content: post.content,
+    date: post.updatedAt.toISOString().split("T")[0], // Format date as YYYY-MM-DD
+  }));
+
+  // Calculate pagination details
+  const totalPages = Math.ceil(count / pagination.pageSize);
+  const nextPage = pagination.pageNumber < totalPages ? pagination.pageNumber + 1 : null;
+
+  return {
+    posts,
+    total: count,
+    page: pagination.pageNumber,
+    pageSize: pagination.pageSize,
+    nextPage: generateNextPageUrl(nextPage, pagination.pageSize, req),
+  };
+};
+
 const getPostById = async (postId) => {
   const post = await Post.findByPk(postId);
   if (!post) {
@@ -87,7 +131,7 @@ const deletePost = async (postId, userId) => {
   return { success: true, message: "Post deleted successfully" };
 };
 
-export { createPost, getPosts, getPostById, updatePost, deletePost };
+export { createPost, getPosts, getPostById, updatePost, deletePost, getMyPosts };
 
 /**
  {

@@ -3,6 +3,24 @@ import Post from "../sequelize/models/post.model.js";
 import { Sequelize } from "sequelize";
 import { validatePagination, generateNextPageUrl } from "../utils/pagination.js";
 import paginationConfig from "../utils/pagination.config.js";
+
+//for handling reply to comments
+const getCommentDepth = async (commentId) => {
+  let depth = 0;
+  let currentCommentId = commentId;
+
+  while (currentCommentId) {
+    const comment = await Comment.findByPk(currentCommentId);
+    if (!comment || !comment.ParentId) {
+      break;
+    }
+    currentCommentId = comment.ParentId;
+    depth += 1;
+  }
+
+  return depth;
+};
+
 // Create a new comment
 const createComment = async (title, content, PostId, ParentId, UserId) => {
   const post = await Post.findByPk(PostId);
@@ -23,6 +41,11 @@ const createComment = async (title, content, PostId, ParentId, UserId) => {
         success: false,
         message: "You can't reply to a non-existing comment",
       };
+    }
+    // Calculate the depth of the comment thread
+    const depth = await getCommentDepth(ParentId);
+    if (depth >= 2) {
+      ParentId = null; // Set ParentId to null if depth is 3 or more
     }
   }
 

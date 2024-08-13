@@ -10,7 +10,7 @@ import { BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, UNAUTHORIZED, OK, NOT_FOUN
 
 // Create a new comment
 const createComment = async (req, res) => {
-  const { title, content, PostId, ParentId } = req.body;
+  const { title = "reply", content, PostId, ParentId } = req.body;
   const { id } = req.user; // Extract UserId from authenticated user
 
   try {

@@ -2,7 +2,7 @@ import { body, query, param } from "express-validator";
 // Create Comment Validation Rules
 const createCommentValidationRules = [
   body("PostId").isInt().withMessage("Valid PostId is required"),
-  body("title").notEmpty().withMessage("Title is required"),
+  body("title").optional().notEmpty().withMessage("Title is required"),
   body("content").notEmpty().withMessage("Content is required"),
 ];
 

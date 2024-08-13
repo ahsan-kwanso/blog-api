@@ -3,7 +3,6 @@ import User from "../sequelize/models/user.model.js";
 import db from "../sequelize/models/index.js";
 import { validatePagination, generateNextPageUrl } from "../utils/pagination.js";
 import paginationConfig from "../utils/pagination.config.js";
-
 const createPost = async (title, content, userId) => {
   const post = await Post.create({ title, content, UserId: userId });
   return post;
@@ -18,10 +17,8 @@ const getPosts = async (req) => {
     return { success: false, message: pagination.error };
   }
 
-  // Fetch posts with pagination
+  // Fetch all posts with author information
   const { count, rows } = await db.Post.findAndCountAll({
-    limit: pagination.pageSize,
-    offset: (pagination.pageNumber - 1) * pagination.pageSize,
     include: [
       {
         model: User,
@@ -29,7 +26,9 @@ const getPosts = async (req) => {
       },
     ],
   });
-  const posts = rows.map((post) => ({
+
+  // Transform the fetched posts with author information
+  const allPosts = rows.map((post) => ({
     id: post.id,
     author: post.User.name, // Access the user's name
     title: post.title,
@@ -37,12 +36,17 @@ const getPosts = async (req) => {
     date: post.updatedAt.toISOString().split("T")[0], // Format date as YYYY-MM-DD
   }));
 
+  // Apply pagination to the transformed posts
+  const startIndex = (pagination.pageNumber - 1) * pagination.pageSize;
+  const endIndex = startIndex + pagination.pageSize;
+  const paginatedPosts = allPosts.slice(startIndex, endIndex);
+
   // Calculate pagination details
   const totalPages = Math.ceil(count / pagination.pageSize);
   const nextPage = pagination.pageNumber < totalPages ? pagination.pageNumber + 1 : null;
 
   return {
-    posts,
+    posts: paginatedPosts,
     total: count,
     page: pagination.pageNumber,
     pageSize: pagination.pageSize,

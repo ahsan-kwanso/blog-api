@@ -8,7 +8,7 @@ const createPost = async (title, content, userId) => {
   return post;
 };
 
-const getPosts = async (req) => {
+const getPosts2 = async (req) => {
   const { page = paginationConfig.defaultPage, limit = paginationConfig.defaultLimit } = req.query;
 
   // Validate pagination parameters
@@ -47,6 +47,48 @@ const getPosts = async (req) => {
 
   return {
     posts: paginatedPosts,
+    total: count,
+    page: pagination.pageNumber,
+    pageSize: pagination.pageSize,
+    nextPage: generateNextPageUrl(nextPage, pagination.pageSize, req),
+  };
+};
+
+const getPosts = async (req) => {
+  const { page = paginationConfig.defaultPage, limit = paginationConfig.defaultLimit } = req.query;
+
+  // Validate pagination parameters
+  const pagination = validatePagination(page, limit);
+  if (pagination.error) {
+    return { success: false, message: pagination.error };
+  }
+
+  // Fetch posts with pagination
+  const { count, rows } = await db.Post.findAndCountAll({
+    limit: pagination.pageSize,
+    offset: (pagination.pageNumber - 1) * pagination.pageSize,
+    include: [
+      {
+        model: User,
+        attributes: ["name"], // Fetch only the name attribute from the User model
+      },
+    ],
+    order: [["createdAt", "DESC"]],
+  });
+  const posts = rows.map((post) => ({
+    id: post.id,
+    author: post.User.name, // Access the user's name
+    title: post.title,
+    content: post.content,
+    date: post.updatedAt.toISOString().split("T")[0], // Format date as YYYY-MM-DD
+  }));
+
+  // Calculate pagination details
+  const totalPages = Math.ceil(count / pagination.pageSize);
+  const nextPage = pagination.pageNumber < totalPages ? pagination.pageNumber + 1 : null;
+
+  return {
+    posts,
     total: count,
     page: pagination.pageNumber,
     pageSize: pagination.pageSize,

@@ -117,7 +117,7 @@ const getPostWithCommentsById = async (postId) => {
 
     const postsWithComments = await getPostsWithNestedComments(posts);
     const postWithComments = postsWithComments.filter((post) => post.id == postId);
-    return { success: true, data: postWithComments };
+    return { success: true, data: postWithComments[0] };
   } catch (error) {
     console.error("Error fetching post with comments:", error);
     return { success: false, message: "Internal server error" };

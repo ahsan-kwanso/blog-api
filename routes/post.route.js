@@ -8,6 +8,7 @@ import {
   deletePost,
   getMyPosts,
   getPostsByTitle,
+  searchUserPostsByTitle,
 } from "../controllers/post.controller.js";
 
 import {
@@ -24,6 +25,7 @@ const router = express.Router();
 router.post("/", authenticateJWT, validate(createPostValidationRules), createPost);
 router.get("/", authenticateJWT, getPosts);
 router.get("/search", authenticateJWT, getPostsByTitle);
+router.get("/me/search", authenticateJWT, searchUserPostsByTitle);
 router.get("/me", authenticateJWT, getMyPosts);
 router.get("/:post_id", validate(getPostByIdValidationRules), authenticateJWT, getPostById);
 router.put("/:post_id", authenticateJWT, validate(updatePostValidationRules), updatePost);

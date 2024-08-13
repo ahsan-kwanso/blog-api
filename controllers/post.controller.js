@@ -6,6 +6,7 @@ import {
   updatePost as updatePostService,
   deletePost as deletePostService,
   searchPostsByTitle as searchPostsByTitleService,
+  searchUserPostsByTitle as searchUserPostsByTitleService,
 } from "../services/post.service.js";
 import { CREATED, INTERNAL_SERVER_ERROR, UNAUTHORIZED, OK, NOT_FOUND, FORBIDDEN } from "http-status-codes";
 
@@ -110,4 +111,19 @@ const getPostsByTitle = async (req, res) => {
   }
 };
 
-export { createPost, getPosts, getPostById, updatePost, deletePost, getMyPosts, getPostsByTitle };
+const searchUserPostsByTitle = async (req, res) => {
+  try {
+    const data = await searchUserPostsByTitleService(req);
+    return res.status(OK).json({
+      total: data.total,
+      page: data.page,
+      pageSize: data.pageSize,
+      nextPage: data.nextPage,
+      posts: data.posts,
+    });
+  } catch (error) {
+    return res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+  }
+};
+
+export { createPost, getPosts, getPostById, updatePost, deletePost, getMyPosts, getPostsByTitle, searchUserPostsByTitle };

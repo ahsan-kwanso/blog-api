@@ -2,8 +2,13 @@ import { body, query, param } from "express-validator";
 // Create Comment Validation Rules
 const createCommentValidationRules = [
   body("PostId").isInt().withMessage("Valid PostId is required"),
-  body("title").optional().notEmpty().withMessage("Title is required"),
-  body("content").notEmpty().withMessage("Content is required"),
+  body("title").optional().trim().notEmpty().withMessage("Title is required"),
+  body("content")
+    .trim() // Remove leading and trailing spaces
+    .notEmpty()
+    .withMessage("Content is required")
+    .custom((value) => value.length > 0)
+    .withMessage("Content cannot be only spaces"),
 ];
 
 // Update Comment Validation Rules

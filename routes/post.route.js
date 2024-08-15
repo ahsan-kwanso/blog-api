@@ -23,7 +23,7 @@ import { validate } from "../validators/validate.js";
 const router = express.Router();
 
 router.post("/", authenticateJWT, validate(createPostValidationRules), createPost);
-router.get("/", authenticateJWT, getPosts);
+router.get("/", getPosts); //removed jwt authentication
 router.get("/search", authenticateJWT, getPostsByTitle);
 router.get("/me/search", authenticateJWT, searchUserPostsByTitle);
 router.get("/me", authenticateJWT, getMyPosts);

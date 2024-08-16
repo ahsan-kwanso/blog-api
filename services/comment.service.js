@@ -83,12 +83,6 @@ const buildCommentTree = (comments) => {
 // Get comments by post ID with optional pagination
 const getCommentsByPostId = async (req) => {
   const { post_id } = req.params;
-  const { page = paginationConfig.defaultPage, limit = paginationConfig.defaultLimit } = req.query;
-  const pagination = validatePagination(page, limit);
-  if (pagination.error) {
-    return { success: false, message: pagination.error };
-  }
-
   const post = await Post.findByPk(post_id);
   if (!post) {
     return { success: false, message: "Post not Found" };
@@ -96,18 +90,9 @@ const getCommentsByPostId = async (req) => {
 
   const comments = await Comment.findAndCountAll({
     where: { PostId: post_id },
-    limit: pagination.pageSize,
-    offset: (pagination.pageNumber - 1) * pagination.pageSize,
   });
   const commentsWithSubComments = buildCommentTree(comments.rows);
-  const totalPages = Math.ceil(comments.count / pagination.pageSize);
-  const nextPage = pagination.pageNumber < totalPages ? pagination.pageNumber + 1 : null;
-
   const data = {
-    total: comments.count,
-    page: pagination.pageNumber,
-    pageSize: pagination.pageSize,
-    nextPageUrl: generateNextPageUrl(nextPage, pagination.pageSize, req),
     comments: commentsWithSubComments,
   };
   return { success: true, data: data };

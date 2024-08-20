@@ -45,7 +45,7 @@ const createComment = async (title, content, PostId, ParentId, UserId) => {
     // Calculate the depth of the comment thread
     const depth = await getCommentDepth(ParentId);
     if (depth >= 2) {
-      ParentId = null; // Set ParentId to null if depth is 3 or more
+      ParentId = parentComment.ParentId; // Set ParentId to the upper parent comment if depth is 3 or more
     }
   }
 

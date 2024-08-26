@@ -7,6 +7,8 @@ import {
   deletePost as deletePostService,
   searchPostsByTitle as searchPostsByTitleService,
   searchUserPostsByTitle as searchUserPostsByTitleService,
+  getMyPosts2 as getMyPosts2Service,
+  searchUserPostsByTitle2 as searchUserPostsByTitle2Service,
 } from "../services/post.service.js";
 import { CREATED, INTERNAL_SERVER_ERROR, UNAUTHORIZED, OK, NOT_FOUND, FORBIDDEN } from "http-status-codes";
 
@@ -24,7 +26,16 @@ const createPost = async (req, res) => {
 
 const getPosts = async (req, res) => {
   try {
-    const data = await getPostsService(req);
+    const { filter } = req.query;
+    //console.log(req.query);
+    let data;
+    if (filter === "my-posts" && req.query.userId) {
+      // If filter is "my-posts", call getMyPosts service
+      data = await getMyPosts2Service(req);
+    } else {
+      // Otherwise, call the regular getPostsService
+      data = await getPostsService(req);
+    }
     res.status(OK).json({
       total: data.total,
       page: data.page,
@@ -98,7 +109,14 @@ const deletePost = async (req, res) => {
 
 const getPostsByTitle = async (req, res) => {
   try {
-    const data = await searchPostsByTitleService(req);
+    const { filter } = req.query;
+    //console.log(req.query);
+    let data;
+    if (filter === "my-posts" && req.query.userId) {
+      data = await searchUserPostsByTitle2Service(req);
+    } else {
+      data = await searchPostsByTitleService(req);
+    }
     res.status(OK).json({
       total: data.total,
       page: data.page,

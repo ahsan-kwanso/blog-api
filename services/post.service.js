@@ -55,8 +55,7 @@ const getPosts2 = async (req) => {
 };
 
 const getPosts = async (req) => {
-  const { page = paginationConfig.defaultPage, limit = paginationConfig.defaultLimit } = req.query;
-
+  const { page = paginationConfig.defaultPage, limit = paginationConfig.defaultLimit, filter } = req.query;
   // Validate pagination parameters
   const pagination = validatePagination(page, limit);
   if (pagination.error) {
@@ -96,7 +95,59 @@ const getPosts = async (req) => {
   };
 };
 
+const getMyPosts2 = async (req) => {
+  const { page = paginationConfig.defaultPage, limit = paginationConfig.defaultLimit } = req.query;
+  const userId = req.query.userId;
+  console.log(userId);
+  console.log("Call Here: ", req.query);
+  if (!userId) {
+    return { success: true, posts: [], total: 0, nextPage: null }; // Return an empty result
+  }
+
+  // Validate pagination parameters
+  const pagination = validatePagination(page, limit);
+  if (pagination.error) {
+    return { success: false, message: pagination.error };
+  }
+
+  // Fetch posts with pagination
+  const { count, rows } = await db.Post.findAndCountAll({
+    where: {
+      UserId: userId, // Filter posts by the current user's ID
+    },
+    limit: pagination.pageSize,
+    offset: (pagination.pageNumber - 1) * pagination.pageSize,
+    include: [
+      {
+        model: User,
+        attributes: ["name"], // Fetch only the name attribute from the User model
+      },
+    ],
+    order: [["createdAt", "DESC"]],
+  });
+  const posts = rows.map((post) => ({
+    id: post.id,
+    author: post.User.name, // Access the user's name
+    title: post.title,
+    content: post.content,
+    date: post.updatedAt.toISOString().split("T")[0], // Format date as YYYY-MM-DD
+  }));
+
+  // Calculate pagination details
+  const totalPages = Math.ceil(count / pagination.pageSize);
+  const nextPage = pagination.pageNumber < totalPages ? pagination.pageNumber + 1 : null;
+
+  return {
+    posts,
+    total: count,
+    page: pagination.pageNumber,
+    pageSize: pagination.pageSize,
+    nextPage: generateNextPageUrl(nextPage, pagination.pageSize, req),
+  };
+};
+
 const getMyPosts = async (req) => {
+  // Other one created as according to requirements of blog app
   const { page = paginationConfig.defaultPage, limit = paginationConfig.defaultLimit } = req.query;
   const userId = req.user.id;
   // Validate pagination parameters
@@ -272,7 +323,67 @@ const searchUserPostsByTitle = async (req) => {
   };
 };
 
-export { createPost, getPosts, getPostById, updatePost, deletePost, getMyPosts, searchPostsByTitle, searchUserPostsByTitle };
+//these second services are added later as we want custom auth not jwt changes are made according to frontend req
+const searchUserPostsByTitle2 = async (req) => {
+  const { page = paginationConfig.defaultPage, limit = paginationConfig.defaultLimit, title } = req.query;
+  const userId = req.query.userId; // Extract UserId from query as sent from front end
+
+  // Validate pagination parameters
+  const pagination = validatePagination(page, limit);
+  if (pagination.error) {
+    return { success: false, message: pagination.error };
+  }
+
+  // Fetch posts with pagination and search by title for the authenticated user
+  const { count, rows } = await db.Post.findAndCountAll({
+    where: {
+      title: {
+        [db.Sequelize.Op.iLike]: `%${title}%`, // Case-insensitive search
+      },
+      UserId: userId, // Filter by UserId
+    },
+    limit: pagination.pageSize,
+    offset: (pagination.pageNumber - 1) * pagination.pageSize,
+    include: [
+      {
+        model: db.User,
+        attributes: ["name"], // Fetch only the name attribute from the User model
+      },
+    ],
+  });
+  const posts = rows.map((post) => ({
+    id: post.id,
+    author: post.User.name, // Access the user's name
+    title: post.title,
+    content: post.content,
+    date: post.updatedAt.toISOString().split("T")[0], // Format date as YYYY-MM-DD
+  }));
+
+  // Calculate pagination details
+  const totalPages = Math.ceil(count / pagination.pageSize);
+  const nextPage = pagination.pageNumber < totalPages ? pagination.pageNumber + 1 : null;
+
+  return {
+    posts,
+    total: count,
+    page: pagination.pageNumber,
+    pageSize: pagination.pageSize,
+    nextPage: generateNextPageUrl(nextPage, pagination.pageSize, req),
+  };
+};
+
+export {
+  createPost,
+  getPosts,
+  getPostById,
+  updatePost,
+  deletePost,
+  getMyPosts,
+  searchPostsByTitle,
+  searchUserPostsByTitle,
+  getMyPosts2,
+  searchUserPostsByTitle2,
+};
 
 /**
  {

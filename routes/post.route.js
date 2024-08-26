@@ -24,7 +24,7 @@ const router = express.Router();
 
 router.post("/", authenticateJWT, validate(createPostValidationRules), createPost);
 router.get("/", getPosts); //removed jwt authentication
-router.get("/search", authenticateJWT, getPostsByTitle);
+router.get("/search", getPostsByTitle); //removed jwt auth
 router.get("/me/search", authenticateJWT, searchUserPostsByTitle);
 router.get("/me", authenticateJWT, getMyPosts);
 router.get("/:post_id", validate(getPostByIdValidationRules), authenticateJWT, getPostById);
